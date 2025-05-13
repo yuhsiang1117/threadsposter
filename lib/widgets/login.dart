@@ -1,9 +1,13 @@
+import 'package:flutter/material.dart';
+
 class Login extends StatelessWidget {
+  const Login({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
+        SizedBox(
           width: 402,
           height: 874,
           child: Stack(
@@ -26,7 +30,7 @@ class Login extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Container(
+                      SizedBox(
                         width: 402,
                         child: Stack(
                           children: [
@@ -71,7 +75,7 @@ class Login extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Container(
+                                  SizedBox(
                                     width: double.infinity,
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
@@ -95,7 +99,7 @@ class Login extends StatelessWidget {
                                                     color: Colors.black /* Labels-Primary */,
                                                     fontSize: 17,
                                                     fontFamily: 'SF Pro',
-                                                    fontWeight: FontWeight.w590,
+                                                    fontWeight: FontWeight.w600,
                                                     height: 1.29,
                                                   ),
                                                 ),
@@ -103,7 +107,7 @@ class Login extends StatelessWidget {
                                             ),
                                           ),
                                         ),
-                                        Container(width: 124, height: 10),
+                                        SizedBox(width: 124, height: 10),
                                         Expanded(
                                           child: Container(
                                             padding: const EdgeInsets.only(left: 6, right: 16),
@@ -152,7 +156,7 @@ class Login extends StatelessWidget {
                           ],
                         ),
                       ),
-                      Container(
+                      SizedBox(
                         width: 402,
                         height: 817,
                         child: Stack(
@@ -209,7 +213,7 @@ class Login extends StatelessWidget {
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             spacing: 24,
                                             children: [
-                                              Container(
+                                              SizedBox(
                                                 width: double.infinity,
                                                 child: Column(
                                                   mainAxisSize: MainAxisSize.min,
@@ -272,7 +276,7 @@ class Login extends StatelessWidget {
                                                   ],
                                                 ),
                                               ),
-                                              Container(
+                                              SizedBox(
                                                 width: double.infinity,
                                                 child: Column(
                                                   mainAxisSize: MainAxisSize.min,
@@ -335,7 +339,7 @@ class Login extends StatelessWidget {
                                                   ],
                                                 ),
                                               ),
-                                              Container(
+                                              SizedBox(
                                                 width: double.infinity,
                                                 child: Row(
                                                   mainAxisSize: MainAxisSize.min,
@@ -380,7 +384,7 @@ class Login extends StatelessWidget {
                                                   ],
                                                 ),
                                               ),
-                                              Container(
+                                              SizedBox(
                                                 width: double.infinity,
                                                 child: Row(
                                                   mainAxisSize: MainAxisSize.min,
@@ -394,7 +398,7 @@ class Login extends StatelessWidget {
                                                         fontSize: 16,
                                                         fontFamily: 'Inter',
                                                         fontWeight: FontWeight.w400,
-                                                        textDecoration: TextDecoration.underline,
+                                                        decoration: TextDecoration.underline,
                                                         height: 1.40,
                                                       ),
                                                     ),
@@ -490,7 +494,7 @@ class Login extends StatelessWidget {
               Positioned(
                 left: 0,
                 top: 840,
-                child: Container(
+                child: SizedBox(
                   width: 402,
                   height: 34,
                   child: Stack(
@@ -517,7 +521,7 @@ class Login extends StatelessWidget {
               Positioned(
                 left: 0,
                 top: 0,
-                child: Container(
+                child: SizedBox(
                   width: 402,
                   height: 874,
                   child: Stack(
