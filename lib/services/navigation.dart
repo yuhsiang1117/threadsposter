@@ -71,10 +71,9 @@ class NavigationService {
   //   _router.go('/categories/$categoryId/meals');
   // }
 
-  // void goMealDetailsOnCategory(
-  //     {required String categoryId, required String mealId}) {
-  //   _router.go('/categories/$categoryId/meals/$mealId');
-  // }
+  void goPost() {
+    _router.go('/post');
+  }
 
   // void goMealDetailsOnFavorites({required String mealId}) {
   //   _router.go('/favorites/$mealId');
