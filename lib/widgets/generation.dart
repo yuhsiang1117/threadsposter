@@ -1,4 +1,8 @@
+import 'package:flutter/material.dart';
+
 class Generation extends StatelessWidget {
+  const Generation({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -282,7 +286,7 @@ class Generation extends StatelessWidget {
               Positioned(
                 left: 9,
                 top: 14,
-                child: Container(width: 25, height: 25, child: Stack()),
+                child: SizedBox(width: 25, height: 25, child: Stack()),
               ),
             ],
           ),

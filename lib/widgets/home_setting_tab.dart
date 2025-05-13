@@ -1,9 +1,13 @@
+import 'package:flutter/material.dart';
+
 class Setting extends StatelessWidget {
+  const Setting({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
+        SizedBox(
           width: 402,
           height: 866,
           child: Stack(
@@ -26,7 +30,7 @@ class Setting extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Container(
+                      SizedBox(
                         width: 402,
                         child: Stack(
                           children: [
@@ -71,7 +75,7 @@ class Setting extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Container(
+                                  SizedBox(
                                     width: double.infinity,
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
@@ -95,7 +99,7 @@ class Setting extends StatelessWidget {
                                                     color: Colors.black /* Labels-Primary */,
                                                     fontSize: 17,
                                                     fontFamily: 'SF Pro',
-                                                    fontWeight: FontWeight.w590,
+                                                    fontWeight: FontWeight.w600,
                                                     height: 1.29,
                                                   ),
                                                 ),
@@ -103,7 +107,7 @@ class Setting extends StatelessWidget {
                                             ),
                                           ),
                                         ),
-                                        Container(width: 124, height: 10),
+                                        SizedBox(width: 124, height: 10),
                                         Expanded(
                                           child: Container(
                                             padding: const EdgeInsets.only(left: 6, right: 16),
@@ -152,7 +156,7 @@ class Setting extends StatelessWidget {
                           ],
                         ),
                       ),
-                      Container(
+                      SizedBox(
                         width: 402,
                         height: 817,
                         child: Stack(
@@ -160,7 +164,7 @@ class Setting extends StatelessWidget {
                             Positioned(
                               left: 0,
                               top: 733,
-                              child: Container(
+                              child: SizedBox(
                                 width: 402,
                                 height: 84,
                                 child: Stack(
@@ -201,7 +205,7 @@ class Setting extends StatelessWidget {
                                     Positioned(
                                       left: 0,
                                       top: 0,
-                                      child: Container(
+                                      child: SizedBox(
                                         width: 402,
                                         height: 84,
                                         child: Stack(
@@ -209,7 +213,7 @@ class Setting extends StatelessWidget {
                                             Positioned(
                                               left: 22,
                                               top: 20,
-                                              child: Container(
+                                              child: SizedBox(
                                                 width: 80.40,
                                                 height: 40,
                                                 child: Stack(
@@ -250,7 +254,7 @@ class Setting extends StatelessWidget {
                                             Positioned(
                                               left: 304,
                                               top: 20,
-                                              child: Container(
+                                              child: SizedBox(
                                                 width: 80.40,
                                                 height: 40,
                                                 child: Stack(
@@ -291,7 +295,7 @@ class Setting extends StatelessWidget {
                                             Positioned(
                                               left: 163,
                                               top: 20,
-                                              child: Container(
+                                              child: SizedBox(
                                                 width: 80.40,
                                                 height: 40,
                                                 child: Stack(
@@ -478,7 +482,7 @@ class Setting extends StatelessWidget {
               Positioned(
                 left: 0,
                 top: 832,
-                child: Container(
+                child: SizedBox(
                   width: 402,
                   height: 34,
                   child: Stack(
@@ -505,7 +509,7 @@ class Setting extends StatelessWidget {
               Positioned(
                 left: 0,
                 top: 0,
-                child: Container(
+                child: SizedBox(
                   width: 402,
                   height: 874,
                   child: Stack(

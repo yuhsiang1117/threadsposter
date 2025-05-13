@@ -1,9 +1,13 @@
+import 'package:flutter/material.dart';
+
 class SavedPost extends StatelessWidget {
+  const SavedPost({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
+        SizedBox(
           width: 402,
           height: 866,
           child: Stack(
@@ -26,7 +30,7 @@ class SavedPost extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Container(
+                      SizedBox(
                         width: 402,
                         child: Stack(
                           children: [
@@ -71,7 +75,7 @@ class SavedPost extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Container(
+                                  SizedBox(
                                     width: double.infinity,
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
@@ -95,7 +99,7 @@ class SavedPost extends StatelessWidget {
                                                     color: Colors.black /* Labels-Primary */,
                                                     fontSize: 17,
                                                     fontFamily: 'SF Pro',
-                                                    fontWeight: FontWeight.w590,
+                                                    fontWeight: FontWeight.w600,
                                                     height: 1.29,
                                                   ),
                                                 ),
@@ -103,7 +107,7 @@ class SavedPost extends StatelessWidget {
                                             ),
                                           ),
                                         ),
-                                        Container(width: 124, height: 10),
+                                        SizedBox(width: 124, height: 10),
                                         Expanded(
                                           child: Container(
                                             padding: const EdgeInsets.only(left: 6, right: 16),
@@ -152,7 +156,7 @@ class SavedPost extends StatelessWidget {
                           ],
                         ),
                       ),
-                      Container(
+                      SizedBox(
                         width: 402,
                         height: 817,
                         child: Stack(
@@ -196,7 +200,7 @@ class SavedPost extends StatelessWidget {
                                                   children: [
                                                     ConstrainedBox(
                                                       constraints: BoxConstraints(minHeight: 56),
-                                                      child: Container(
+                                                      child: SizedBox(
                                                         width: double.infinity,
                                                         child: Column(
                                                           mainAxisSize: MainAxisSize.min,
@@ -236,7 +240,7 @@ class SavedPost extends StatelessWidget {
                                                     ),
                                                     ConstrainedBox(
                                                       constraints: BoxConstraints(minHeight: 56),
-                                                      child: Container(
+                                                      child: SizedBox(
                                                         width: double.infinity,
                                                         child: Column(
                                                           mainAxisSize: MainAxisSize.min,
@@ -288,7 +292,7 @@ class SavedPost extends StatelessWidget {
                                                     ),
                                                     ConstrainedBox(
                                                       constraints: BoxConstraints(minHeight: 56),
-                                                      child: Container(
+                                                      child: SizedBox(
                                                         width: double.infinity,
                                                         child: Column(
                                                           mainAxisSize: MainAxisSize.min,
@@ -340,7 +344,7 @@ class SavedPost extends StatelessWidget {
                                                     ),
                                                     ConstrainedBox(
                                                       constraints: BoxConstraints(minHeight: 56),
-                                                      child: Container(
+                                                      child: SizedBox(
                                                         width: double.infinity,
                                                         child: Column(
                                                           mainAxisSize: MainAxisSize.min,
@@ -401,7 +405,7 @@ class SavedPost extends StatelessWidget {
                                     Positioned(
                                       left: 0,
                                       top: 735,
-                                      child: Container(
+                                      child: SizedBox(
                                         width: 402,
                                         height: 84,
                                         child: Stack(
@@ -442,7 +446,7 @@ class SavedPost extends StatelessWidget {
                                             Positioned(
                                               left: 0,
                                               top: 0,
-                                              child: Container(
+                                              child: SizedBox(
                                                 width: 402,
                                                 height: 84,
                                                 child: Stack(
@@ -450,7 +454,7 @@ class SavedPost extends StatelessWidget {
                                                     Positioned(
                                                       left: 22,
                                                       top: 20,
-                                                      child: Container(
+                                                      child: SizedBox(
                                                         width: 80.40,
                                                         height: 40,
                                                         child: Stack(
@@ -491,7 +495,7 @@ class SavedPost extends StatelessWidget {
                                                     Positioned(
                                                       left: 304,
                                                       top: 20,
-                                                      child: Container(
+                                                      child: SizedBox(
                                                         width: 80.40,
                                                         height: 40,
                                                         child: Stack(
@@ -532,7 +536,7 @@ class SavedPost extends StatelessWidget {
                                                     Positioned(
                                                       left: 163,
                                                       top: 20,
-                                                      child: Container(
+                                                      child: SizedBox(
                                                         width: 80.40,
                                                         height: 40,
                                                         child: Stack(
@@ -595,7 +599,7 @@ class SavedPost extends StatelessWidget {
                                     Positioned(
                                       left: 18,
                                       top: 25,
-                                      child: Container(width: 30, height: 30, child: Stack()),
+                                      child: SizedBox(width: 30, height: 30, child: Stack()),
                                     ),
                                   ],
                                 ),
@@ -611,7 +615,7 @@ class SavedPost extends StatelessWidget {
               Positioned(
                 left: 0,
                 top: 832,
-                child: Container(
+                child: SizedBox(
                   width: 402,
                   height: 34,
                   child: Stack(
@@ -638,7 +642,7 @@ class SavedPost extends StatelessWidget {
               Positioned(
                 left: 0,
                 top: 0,
-                child: Container(
+                child: SizedBox(
                   width: 402,
                   height: 874,
                   child: Stack(
