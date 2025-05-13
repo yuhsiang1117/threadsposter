@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:threadsposter/widgets/home_tab.dart';
+import 'package:threadsposter/widgets/home/home_tab.dart';
 import 'package:threadsposter/services/navigation.dart';
 
 void main() {
