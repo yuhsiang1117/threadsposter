@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:threadsposter/widgets/api_test_widget.dart';
 
 class Setting extends StatelessWidget {
   const Setting({super.key});
@@ -11,7 +12,7 @@ class Setting extends StatelessWidget {
         children: [
           _buildProfileSection(),
           const SizedBox(height: 24),
-          _buildMenuSection(),
+          _buildMenuSection(context),
         ],
       ),
     );
@@ -55,7 +56,7 @@ class Setting extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuSection() {
+  Widget _buildMenuSection(BuildContext context) {
     return Card(
       elevation: 2,
       child: Column(
@@ -76,6 +77,17 @@ class Setting extends StatelessWidget {
             icon: Icons.notifications,
             title: '通知設定',
             onTap: () {},
+          ),
+          _buildDivider(),
+          _buildMenuItem(
+            icon: Icons.api,
+            title: 'API 測試工具',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ApiTestWidget()),
+              );
+            },
           ),
           _buildDivider(),
           _buildMenuItem(
