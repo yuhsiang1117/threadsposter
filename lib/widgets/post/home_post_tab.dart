@@ -1,46 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:threadsposter/widgets/post/generation.dart';
+import 'package:threadsposter/widgets/widgets.dart';
 
 class Post extends StatefulWidget {
   const Post({super.key});
 
   @override
   State<Post> createState() => _PostState();
-}
-
-class Selection extends StatefulWidget {
-  final List<String> option;
-  const Selection({required this.option, super.key});
-  @override
-  State<Selection> createState() => _Selection();
-}
-
-class _Selection extends State<Selection> {
-  String? selected;
-  @override
-  void initState() {
-    super.initState();
-    selected = widget.option.isNotEmpty ? widget.option.first : null;
-  }
-
-  @override
-  Widget build(BuildContext contex) {
-    return DropdownButton<String>(
-      value: selected,
-      // icon: const Icon(Icons.arrow_downward),
-      onChanged: (String? value) {
-        setState(() {
-          selected = value;
-        });
-      },
-      isExpanded: true,
-      // menuWidth: 120,
-      items:
-          widget.option.map((option) {
-            return DropdownMenuItem<String>(value: option, child: Text(option));
-          }).toList(),
-    );
-  }
 }
 
 class _PostState extends State<Post> {
@@ -59,15 +24,14 @@ class _PostState extends State<Post> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 10),
+          const SizedBox(height: 5),
           _buildTagSelector(),
+          const SizedBox(height: 5),
+          ToneSelection(),
           const SizedBox(height: 10),
-          Container(
-            width: 120,
-            child: Selection(
-              option: ['Emotion', 'Practicle', 'Identity', 'Trend'],
-            ),
-          ),
+          StyleSelection(),
+          const SizedBox(height: 10),
+          SizeSelection(),
           const SizedBox(height: 20),
           _buildInputField(),
           const SizedBox(height: 20),
