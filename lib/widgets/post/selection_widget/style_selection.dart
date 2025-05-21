@@ -1,30 +1,37 @@
 import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:threadsposter/widgets/widgets.dart';
-
-const List<String> options = [
-  'Emotion',
-  'Practicle',
-  'Identity',
-  'Trend',
-];
+import 'package:threadsposter/models/data_lists.dart';
 
 class StyleSelection extends StatefulWidget {
-  const StyleSelection({super.key});
+
+  final void Function(String)? onStyleSelected;
+  const StyleSelection({super.key, this.onStyleSelected});
+
   @override
   State<StyleSelection> createState() => _StyleSelectionState();
 }
 
 class _StyleSelectionState extends State<StyleSelection> {
 
-  String? dropdownValue;
+  String? selectedStyle;
   double width = 0.0;
+
+  void _onStyleChanged(String tone) {
+    setState(() {
+      selectedStyle = tone;
+    });
+
+    if (widget.onStyleSelected != null) {
+      widget.onStyleSelected!(tone); // 傳出去
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    dropdownValue = options.first;
-    updateWidth(dropdownValue!);
+    selectedStyle = styleOptions.first;
+    updateWidth(selectedStyle!);
   }
 
   void updateWidth(String value) {
@@ -42,7 +49,7 @@ class _StyleSelectionState extends State<StyleSelection> {
     });
   }
   static final List<MenuEntry> menuEntries = UnmodifiableListView<MenuEntry>(
-    options.map<MenuEntry>((String name) => MenuEntry(value: name, label: name)),
+    styleOptions.map<MenuEntry>((String name) => MenuEntry(value: name, label: name)),
   );
   @override
   Widget build(BuildContext contex) {
@@ -59,13 +66,14 @@ class _StyleSelectionState extends State<StyleSelection> {
         ),
         const SizedBox(height: 10),
         DropdownMenu<String>(
-        initialSelection: options.first,
+        initialSelection: styleOptions.first,
         textStyle: const TextStyle(fontSize: 16),
         width: width,
         onSelected: (String? value) {
           setState(() {
-            dropdownValue = value!;
-            updateWidth(dropdownValue!);
+            selectedStyle = value!;
+            _onStyleChanged(value);
+            updateWidth(selectedStyle!);
           });
         },
         dropdownMenuEntries: menuEntries,

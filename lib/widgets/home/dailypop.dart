@@ -1,17 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:threadsposter/services/navigation.dart';
-import 'package:threadsposter/widgets/widgets.dart';
-
-List<String> tagList = [
-  "#地震",
-  "#颱風",
-  "#大雨",
-  "#大雪",
-  "#大霧",
-  "#大風",
-  "#大火",
-];
+import 'package:threadsposter/models/data_lists.dart';
 
 class Dailypop extends StatelessWidget {
   const Dailypop({
@@ -33,7 +23,7 @@ class Dailypop extends StatelessWidget {
       child: InkWell(
         onTap: () {
           final navigationService = Provider.of<NavigationService>(context, listen: false);
-          navigationService.goHome(tab: HomeTab.post);
+          navigationService.goPost(tag: tagOptions[index]);
         },
         child: Center(
           child: Row(
@@ -43,7 +33,7 @@ class Dailypop extends StatelessWidget {
                 child: Padding(
                   padding: EdgeInsets.all(padding),
                   child: Text(
-                    tagList[index],
+                    tagOptions[index],
                     textAlign: TextAlign.left,
                     style: TextStyle(
                       fontSize: screenWidth * 0.05,

@@ -50,8 +50,9 @@ class NavigationService {
     routerConfig.go('/${tab.name}');
   }
 
-  void goPost() {
+  void goPost({required String tag}) {
     routerConfig.go('/post');
+    selectedTag = tag;
   }
 
   // To work with the web browser history, do not use Navigator.push() or pop() directly

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:threadsposter/widgets/widgets.dart';
+import 'package:threadsposter/models/post_query.dart';
 
 class Post extends StatefulWidget {
   const Post({super.key});
@@ -10,6 +11,22 @@ class Post extends StatefulWidget {
 
 class _PostState extends State<Post> {
   final TextEditingController _textController = TextEditingController();
+
+  String selectedStyle = 'Emotion';
+  String selectedTone = 'None';
+  String selectedTag = '';
+  int selectedSize = parseSize("Short");
+
+  PostQuery postQuery = PostQuery(
+    userQuery: '',
+    tag: '',
+    style: 'Emotion',
+    withInDays: 30,
+    size: 20,
+    gclikes: 5,
+    returnCount: 3,
+    tone: 'None',
+  );
 
   @override
   void dispose() {
@@ -25,13 +42,37 @@ class _PostState extends State<Post> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 5),
-          _buildTagSelector(),
+          TagSelection(
+            onTagSelected: (tag) {
+              setState(() {
+                selectedTag = tag;
+              });
+            },
+          ),
           const SizedBox(height: 5),
-          ToneSelection(),
+          ToneSelection(
+            onToneSelected: (tone) {
+              setState(() {
+                selectedTone = tone;
+              });
+            },
+          ),
           const SizedBox(height: 10),
-          StyleSelection(),
+          StyleSelection(
+            onStyleSelected: (style) {
+              setState(() {
+                selectedStyle = style;
+              });
+            },
+          ),
           const SizedBox(height: 10),
-          SizeSelection(),
+          SizeSelection(
+            onSizeSelected: (size) {
+              setState(() {
+                selectedSize = parseSize(size);
+              });
+            },
+          ),
           const SizedBox(height: 20),
           _buildInputField(),
           const SizedBox(height: 20),
@@ -41,58 +82,10 @@ class _PostState extends State<Post> {
     );
   }
 
-  Widget _buildTagSelector() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(
-              '選擇熱門標籤',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-          ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Row(
-              children: [
-                _buildTag('#地震'),
-                _buildTag('#颱風'),
-                _buildTag('#大雨'),
-                _buildTag('#大雪'),
-                _buildTag('#大霧'),
-                _buildTag('#大風'),
-                _buildTag('#大火'),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTag(String tag) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: Chip(
-        label: Text(tag),
-        backgroundColor: Colors.purple.shade100,
-        onDeleted: null,
-      ),
-    );
-  }
-
   Widget _buildInputField() {
     return TextField(
       controller: _textController,
-      maxLines: 6,
+      maxLines: 5,
       decoration: InputDecoration(
         hintText: '請輸入您想要發表的內容...',
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
@@ -105,6 +98,10 @@ class _PostState extends State<Post> {
   Widget _buildGenerateButton() {
     return ElevatedButton(
       onPressed: () {
+        _buildPostQuery();
+        print('=======================');
+        print(postQuery.toJson());
+        print('=======================');
         showModalBottomSheet(
           context: context,
           isScrollControlled: true,
@@ -123,5 +120,16 @@ class _PostState extends State<Post> {
       ),
       child: const Text('生成發文內容', style: TextStyle(fontSize: 18)),
     );
+  }
+
+  void _buildPostQuery() {
+    postQuery.userQuery = _textController.text;
+    postQuery.tag = selectedTag;
+    postQuery.style = selectedStyle;
+    postQuery.withInDays = 30; // TODO: Get selected days
+    postQuery.size = selectedSize;
+    postQuery.gclikes = 5; // TODO: Get selected gclikes
+    postQuery.returnCount = 3; // TODO: Get selected return count
+    postQuery.tone = selectedTone;
   }
 }

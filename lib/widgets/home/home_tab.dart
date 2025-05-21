@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:threadsposter/widgets/widgets.dart';
+import 'package:threadsposter/models/data_lists.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -18,7 +19,7 @@ class Home extends StatelessWidget {
           crossAxisSpacing: 10.0,
           mainAxisSpacing: 10.0,
         ),
-        itemCount: tagList.length,
+        itemCount: tagOptions.length,
         itemBuilder: (context, index) => Dailypop(
           screenWidth: screenWidth, 
           index: index,

@@ -1,17 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:threadsposter/models/data_lists.dart';
 
-String _selectedTone = 'None';
+String selectedTag = '';
 
-class ToneSelection extends StatefulWidget {
-  const ToneSelection({super.key});
+class TagSelection extends StatefulWidget {
+
+  final void Function(String)? onTagSelected;
+  const TagSelection({super.key, this.onTagSelected});
 
   @override
-  State<ToneSelection> createState() => _ToneSelectionState();
+  State<TagSelection> createState() => _TagSelectionState();
 }
 
-class _ToneSelectionState extends State<ToneSelection> {
+class _TagSelectionState extends State<TagSelection> {
+
+  String _selectedTag = '';
+  void _onTagChanged(String tag) {
+    setState(() {
+      _selectedTag = tag;
+    });
+
+    if (widget.onTagSelected != null) {
+      widget.onTagSelected!(tag); // 傳出去
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    if(selectedTag != '') {
+      _selectedTag = selectedTag;
+      selectedTag = '';
+    }
     return _buildToneSelector();
   }
 
@@ -28,7 +47,7 @@ class _ToneSelectionState extends State<ToneSelection> {
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
-              '選擇語氣風格',
+              '選擇熱門標籤',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),
@@ -36,15 +55,10 @@ class _ToneSelectionState extends State<ToneSelection> {
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Row(
-              children: [
-                _buildTone('None'),
-                _buildTone('Boss'),
-                _buildTone('Simp'),
-                _buildTone('Elder'),
-                _buildTone('Elder Simp'),
-                _buildTone('Elder Boss'),
-                _buildTone('Elder Boss Simp'),
-              ],
+              children: tagOptions.map(
+                (tag) {
+                  return _buildTag(tag);
+                }).toList()
             ),
           ),
         ],
@@ -52,19 +66,17 @@ class _ToneSelectionState extends State<ToneSelection> {
     );
   }
 
-  Widget _buildTone(String tag) {
+  Widget _buildTag(String tag) {
     return TextButton(
       onPressed: () => {
-        print('Selected tone: $tag'),
-        setState(() {
-          _selectedTone = tag;
-        })
+        _onTagChanged(tag)
       },
       child: Chip(
         label: Text(tag),
-        backgroundColor: _selectedTone == tag ? Colors.purple : Colors.purple.shade100,
+        backgroundColor: _selectedTag == tag ? Colors.purple : Colors.purple.shade100,
         onDeleted: null,
       ),
     );
   }
+  
 }
