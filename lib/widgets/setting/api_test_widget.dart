@@ -17,7 +17,7 @@ class _ApiTestWidgetState extends State<ApiTestWidget> {
   // Form field controllers
   final _userQueryController = TextEditingController(text: 'Flutter 开发');
   final _tagController = TextEditingController(text: 'tech');
-  final _styleController = TextEditingController(text: 'informative');
+  final _styleController = TextEditingController(text: 'Emotion');
   final _withindaysController = TextEditingController(text: '30');
   final _sizeController = TextEditingController(text: '5');
   final _gclikesController = TextEditingController(text: '10');

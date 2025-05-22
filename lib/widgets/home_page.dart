@@ -14,23 +14,23 @@ class HomePage extends StatelessWidget {
 
   const HomePage({super.key, required this.selectedTab});
 
-  void _onNavigationItemTapped(BuildContext context, int index) {
-    final navigationService = Provider.of<NavigationService>(context, listen: false);
-    final selectedTab = index == 0 
-        ? HomeTab.home 
-        : index == 1 
-            ? HomeTab.post 
-            : HomeTab.setting;
+  // void _onNavigationItemTapped(BuildContext context, int index) {
+  //   final navigationService = Provider.of<NavigationService>(context, listen: false);
+  //   final selectedTab = index == 0 
+  //       ? HomeTab.home 
+  //       : index == 1 
+  //           ? HomeTab.post 
+  //           : HomeTab.setting;
     
-    navigationService.goHome(tab: selectedTab);
-  }
+  //   navigationService.goHome(tab: selectedTab);
+  // }
 
   @override
   Widget build(BuildContext context) {
     final List<Map<String, dynamic>> tabsConfig = [
       {
         'page': const Home(),
-        'title': '本日熱門',
+        'title': '選擇角色',
         'icon': const Icon(Icons.home),
         'label': 'Home',
       },
@@ -61,14 +61,14 @@ class HomePage extends StatelessWidget {
         ),
       ),
       body: currentTabConfig['page'],
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: (index) => _onNavigationItemTapped(context, index),
-        currentIndex: selectedTab.index,
-        items: tabsConfig.map((tabConfig) => BottomNavigationBarItem(
-          icon: tabConfig['icon'],
-          label: tabConfig['label'],
-        )).toList(),
-      ),
+      // bottomNavigationBar: BottomNavigationBar(
+      //   onTap: (index) => _onNavigationItemTapped(context, index),
+      //   currentIndex: selectedTab.index,
+      //   items: tabsConfig.map((tabConfig) => BottomNavigationBarItem(
+      //     icon: tabConfig['icon'],
+      //     label: tabConfig['label'],
+      //   )).toList(),
+      // ),
     );
   }
 }

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:threadsposter/models/data_lists.dart';
 
-String selectedTag = '';
-
 class TagSelection extends StatefulWidget {
 
   final void Function(String)? onTagSelected;
@@ -27,10 +25,6 @@ class _TagSelectionState extends State<TagSelection> {
 
   @override
   Widget build(BuildContext context) {
-    if(selectedTag != '') {
-      _selectedTag = selectedTag;
-      selectedTag = '';
-    }
     return _buildToneSelector();
   }
 

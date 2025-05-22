@@ -9,19 +9,19 @@ final routerConfig = GoRouter(
     GoRoute(
       path: '/home',
       pageBuilder: (context, state) => const NoTransitionPage<void>(
-        child: HomePage(selectedTab: HomeTab.home)
+        child: Home()
       ),
     ),
     GoRoute(
       path: '/post',
       pageBuilder: (context, state) => const NoTransitionPage<void>(
-        child: HomePage(selectedTab: HomeTab.post)
+        child: Post()
       ),
     ),
     GoRoute(
       path: '/setting',
       pageBuilder: (context, state) => const NoTransitionPage<void>(
-        child: HomePage(selectedTab: HomeTab.setting)
+        child: Setting()
       ),
     ),
   ],
@@ -46,13 +46,17 @@ class NavigationService {
     return GoRouterState.of(context).uri.path;
   }
 
-  void goHome({required HomeTab tab}) {
-    routerConfig.go('/${tab.name}');
+  void goHome() {
+    routerConfig.go('/home');
   }
 
-  void goPost({required String tag}) {
+  void goPost({required String tone}) {
     routerConfig.go('/post');
-    selectedTag = tag;
+    currentTone = tone;
+  }
+
+  void goSetting() {
+    routerConfig.go('/setting');
   }
 
   // To work with the web browser history, do not use Navigator.push() or pop() directly

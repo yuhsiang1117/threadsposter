@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:threadsposter/services/navigation.dart';
 import 'package:threadsposter/widgets/setting/api_test_widget.dart';
 
 class Setting extends StatelessWidget {
@@ -6,14 +8,28 @@ class Setting extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: ListView(
-        children: [
-          _buildProfileSection(),
-          const SizedBox(height: 24),
-          _buildMenuSection(context),
-        ],
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            final navigationService = Provider.of<NavigationService>(context, listen: false);
+            navigationService.goHome();
+          },
+        ),
+        title: const Text('設定'),
+        backgroundColor: Colors.deepPurple,
+        foregroundColor: Colors.white,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ListView(
+          children: [
+            _buildProfileSection(),
+            const SizedBox(height: 24),
+            _buildMenuSection(context),
+          ],
+        ),
       ),
     );
   }

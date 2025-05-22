@@ -78,12 +78,12 @@ class _SizeSelectionState extends State<SizeSelection> {
 int parseSize(String size) {
   switch (size) {
     case 'Short':
-      return 20;
+      return 10;
     case 'Medium':
-      return 50;
+      return 30;
     case 'Long':
-      return 100;
+      return 50;
     default:
-      return 20; // Default to Medium if no match
+      return 30; // Default to Medium if no match
   }
 }

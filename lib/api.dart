@@ -76,3 +76,64 @@ Future<bool> changeTone({required String tone, http.Client? client}) async {
   }
   return json['success'];
 }
+
+Future<List<String>> getTone({http.Client? client}) async {
+  final httpClient = client ?? http.Client();
+  final url = Uri.parse('http://localhost:8000/styles'); // FastAPI API
+  final response = await httpClient.get(
+    url,
+    headers: {'Content-Type': 'application/json'},
+  );
+  final json = jsonDecode(response.body);
+  if (response.statusCode != 200) {
+    throw Exception('HTTP 錯誤：${response.statusCode}');
+  }
+  if (client == null) {
+    httpClient.close(); // 只關閉自己建立的 client
+  }
+  if (json['success'] == true && json['styles'] is List) {
+    return List<String>.from(json['styles']);
+  } else {
+    throw Exception('API 錯誤：${json["error"] ?? "未知錯誤"}');
+  }
+}
+
+Future<bool> post({required String text, http.Client? client}) async {
+  final httpClient = client ?? http.Client();
+  final url = Uri.parse('http://localhost:8000/post'); // FastAPI API
+  final response = await httpClient.post(
+    url,
+    body: jsonEncode({'text': text}),
+    headers: {'Content-Type': 'application/json'},
+  );
+  final json = jsonDecode(response.body);
+  if (response.statusCode != 200) {
+    throw Exception('HTTP 錯誤：${response.statusCode}');
+  }
+  if (client == null) {
+    httpClient.close(); // 只關閉自己建立的 client
+  }
+  return json['success'];
+}
+
+Future<List<String>> getAvailableTones({http.Client? client}) async {
+  final httpClient = client ?? http.Client();
+  final url = Uri.parse('http://localhost:8000/valid_tone'); // FastAPI API
+  final response = await httpClient.get(
+    url,
+    headers: {'Content-Type': 'application/json'},
+  );
+  final json = jsonDecode(response.body);
+  if (response.statusCode != 200) {
+    throw Exception('HTTP 錯誤：${response.statusCode}');
+  }
+  if (client == null) {
+    httpClient.close();
+  }
+  if (json['success'] == true) {
+    List<dynamic> tones = json['tones'];
+    return tones.map((tone) => tone.toString()).toList();
+  } else {
+    throw Exception('API 錯誤：${json["error"]}');
+  }
+}

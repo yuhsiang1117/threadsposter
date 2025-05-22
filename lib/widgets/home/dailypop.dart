@@ -15,47 +15,19 @@ class Dailypop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final padding = screenWidth * 0.05;
     
-    return Card(
-      margin: const EdgeInsets.all(10),
-      color: Colors.blue,
-      child: InkWell(
-        onTap: () {
-          final navigationService = Provider.of<NavigationService>(context, listen: false);
-          navigationService.goPost(tag: tagOptions[index]);
-        },
-        child: Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.all(padding),
-                  child: Text(
-                    tagOptions[index],
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.05,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.all(padding),
-                  child: Text(
-                    "立即發文 >",
-                    textAlign: TextAlign.right,
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.03,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+    return GestureDetector(
+      onTap: () {
+        final navigationService = Provider.of<NavigationService>(context, listen: false);
+        navigationService.goPost(tone: toneOptions[index].name);
+      },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Image.asset(
+          'assets/images/${toneOptions[index].name}.png',
+          width: screenWidth * 0.8,
+          height: screenWidth * 0.8,
+          fit: BoxFit.cover,
         ),
       ),
     );

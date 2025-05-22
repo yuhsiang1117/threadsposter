@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:threadsposter/models/data_lists.dart';
 
+String selectedTone = '';
+
 class ToneSelection extends StatefulWidget {
 
   final void Function(String)? onToneSelected;
@@ -25,6 +27,10 @@ class _ToneSelectionState extends State<ToneSelection> {
 
   @override
   Widget build(BuildContext context) {
+    if(selectedTone != '') {
+      _selectedTone = selectedTone;
+      selectedTone = '';
+    }
     return _buildToneSelector();
   }
 
@@ -41,7 +47,7 @@ class _ToneSelectionState extends State<ToneSelection> {
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
-              '選擇語氣風格',
+              '選擇語氣',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),
@@ -51,7 +57,7 @@ class _ToneSelectionState extends State<ToneSelection> {
             child: Row(
               children: toneOptions.map(
                 (tone) {
-                  return _buildTone(tone);
+                  return _buildTone(tone.name);
                 }).toList()
             ),
           ),
@@ -60,14 +66,14 @@ class _ToneSelectionState extends State<ToneSelection> {
     );
   }
 
-  Widget _buildTone(String tag) {
+  Widget _buildTone(String tone) {
     return TextButton(
       onPressed: () => {
-        _onToneChanged(tag)
+        _onToneChanged(tone)
       },
       child: Chip(
-        label: Text(tag),
-        backgroundColor: _selectedTone == tag ? Colors.purple : Colors.purple.shade100,
+        label: Text(tone),
+        backgroundColor: _selectedTone == tone ? Colors.purple : Colors.purple.shade100,
         onDeleted: null,
       ),
     );
