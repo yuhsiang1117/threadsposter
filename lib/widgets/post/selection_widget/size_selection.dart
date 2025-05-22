@@ -1,31 +1,40 @@
 import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:threadsposter/widgets/widgets.dart';
-
-const List<String> size = [
-  'Short',
-  'Medium',
-  'Long'
-];
+import 'package:threadsposter/models/data_lists.dart';
 
 class SizeSelection extends StatefulWidget {
-  const SizeSelection({super.key});
+
+  final void Function(String)? onSizeSelected;
+  const SizeSelection({super.key, this.onSizeSelected});
+
   @override
   State<SizeSelection> createState() => _SizeSelectionState();
 }
 
 class _SizeSelectionState extends State<SizeSelection> {
 
-  String? dropdownValue;
+  String? selectedSize;
 
   @override
   void initState() {
     super.initState();
-    dropdownValue = size.first;
+    selectedSize = size.first;
   }
   static final List<MenuEntry> menuEntries = UnmodifiableListView<MenuEntry>(
     size.map<MenuEntry>((String name) => MenuEntry(value: name, label: name)),
   );
+
+  void _onSizeChanged(String size) {
+    setState(() {
+      selectedSize = size;
+    });
+
+    if (widget.onSizeSelected != null) {
+      widget.onSizeSelected!(size); // 傳出去
+    }
+  }
+
   @override
   Widget build(BuildContext contex) {
     final textPainter = TextPainter(
@@ -55,12 +64,26 @@ class _SizeSelectionState extends State<SizeSelection> {
         width: width,
         onSelected: (String? value) {
           setState(() {
-            dropdownValue = value!;
+            selectedSize = value!;
+            _onSizeChanged(value);
           });
         },
         dropdownMenuEntries: menuEntries,
         )
       ]
     );
+  }
+}
+
+int parseSize(String size) {
+  switch (size) {
+    case 'Short':
+      return 20;
+    case 'Medium':
+      return 50;
+    case 'Long':
+      return 100;
+    default:
+      return 20; // Default to Medium if no match
   }
 }
