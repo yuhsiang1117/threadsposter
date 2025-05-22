@@ -1,7 +1,7 @@
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
-import 'package:threadsposter/widgets/api_test_widget.dart';
+import 'api_test_widget.dart';
 import 'edit_profile.dart';
 class Setting extends StatefulWidget {
   const Setting({super.key});
