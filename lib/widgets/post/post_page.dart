@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:threadsposter/services/navigation.dart';
+import 'package:threadsposter/services/post_query_provider.dart';
 import 'package:threadsposter/widgets/widgets.dart';
 import 'package:threadsposter/models/post_query.dart';
 
@@ -136,7 +137,7 @@ class _PostState extends State<Post> {
             const SizedBox(height: 20),
             _buildQueryInputField(),
             const SizedBox(height: 20),
-            _buildGenerateButton(),
+            _buildGenerateButton(context),
           ],
         ),
       ),
@@ -170,10 +171,11 @@ class _PostState extends State<Post> {
     );
   }
 
-  Widget _buildGenerateButton() {
+  Widget _buildGenerateButton(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
         _buildPostQuery();
+        Provider.of<PostQueryProvider>(context, listen:false).addQuery(postQuery);
         print('=======================');
         print(postQuery.toJson());
         print('=======================');

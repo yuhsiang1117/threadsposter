@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:threadsposter/services/navigation.dart';
-
+import 'package:threadsposter/services/post_query_provider.dart';
 void main() {
   runApp(
     MultiProvider(
       providers: [
         Provider<NavigationService>(create: (context) => NavigationService()),
+        ChangeNotifierProvider<PostQueryProvider>(
+          create: (context) => PostQueryProvider(),
+        ),
       ],
       child: const App(),
     ),
+    
   );
 }
 
