@@ -54,7 +54,8 @@ class _ApiTestWidgetState extends State<ApiTestWidget> {
         withindays: int.parse(_withindaysController.text),
         size: int.parse(_sizeController.text),
         gclikes: int.parse(_gclikesController.text),
-        topK: int.parse(_topKController.text),
+        recommendation: int.parse(_topKController.text),
+        specific_user: '', // 可選填寫特定用戶
       );
 
       setState(() {

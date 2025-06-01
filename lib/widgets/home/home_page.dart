@@ -22,6 +22,7 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
+    debugPrint('[lib/widgets/home/home_page.dart] Home Page Initializing...');
     super.initState();
     Future.microtask((){
       // ignore: use_build_context_synchronously

@@ -27,9 +27,16 @@ List<ToneOption> options = [
 ];
 
 Future<List<ToneOption>> updateToneOptions() async {
-  debugPrint('[lib/models/data_lists.dart] Updating tone options...');
-  final tones = await getAvailableTones();
-  debugPrint('[lib/models/data_lists.dart] Fetched tones: $tones');
+  try{
+    debugPrint('[lib/models/data_lists.dart] Searching styles options...');
+    final styles = await getTone();
+    debugPrint('[lib/models/data_lists.dart] Fetched tones: $styles');
+    debugPrint('[lib/models/data_lists.dart] Updating tone options...');
+    final tones = await getAvailableTones();
+    debugPrint('[lib/models/data_lists.dart] Fetched tones: $tones');
+  } catch (e) {
+    debugPrint('[lib/models/data_lists.dart] Cannot connect to server');
+  }
   // toneOptions = tones
   //     .map<ToneOption>((tone) => ToneOption())
   //     .toList();
@@ -37,9 +44,10 @@ Future<List<ToneOption>> updateToneOptions() async {
 }
 const List<String> styleOptions = [
   'Emotion',
-  'Practicle',
+  'Practical',
   'Identity',
   'Trend',
+  'error test',
 ];
 
 const List<String> size = [

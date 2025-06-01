@@ -25,6 +25,8 @@ class _PostState extends State<Post> {
   int _selectedSize = parseSize("Short");
   int _selectedDays = 15;
   int _selectedLikes = 1000;
+  int _selectedCount = 3;
+  String _errorMessage = '';
 
   PostQuery postQuery = PostQuery(
     userQuery: '',
@@ -35,6 +37,7 @@ class _PostState extends State<Post> {
     gclikes: 1000,
     returnCount: 3,
     tone: 'None',
+    specificUser: '',
   );
 
   @override
@@ -117,17 +120,25 @@ class _PostState extends State<Post> {
                   SizedBox(height: 10),
                   DaysSlider(
                     onDaysSelected: (days) {
-                    setState(() {
-                      _selectedDays = days;
-                    });
+                      setState(() {
+                        _selectedDays = days;
+                      });
                     },
                   ),
                   const SizedBox(height: 10),
                   LikesSlider(
                     onLikesSelected: (likes) {
-                    setState(() {
-                      _selectedLikes = likes;
-                    });
+                      setState(() {
+                        _selectedLikes = likes;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                  CountSlider(
+                    onCountSelected: (count) {
+                      setState(() {
+                        _selectedCount = count;
+                      });
                     },
                   ),
                 ],
@@ -173,41 +184,68 @@ class _PostState extends State<Post> {
   }
 
   Widget _buildGenerateButton() {
-    return ElevatedButton(
-      onPressed: () {
-        _buildPostQuery();
-        print('=======================');
-        print(postQuery.toJson());
-        print('=======================');
-
-        final navigationService = Provider.of<NavigationService>(context, listen: false);
-        // 測試文章
-        // List<GeneratedPost> testPosts = [
-        //   GeneratedPost(
-        //     content: '這是一篇測試文章內容 1',
-        //     score: 5.6,
-        //   ),
-        //   GeneratedPost(
-        //     content: '這是第二篇測試文章內容',
-        //     score: 0.85,
-        //   ),
-        //   GeneratedPost(
-        //     content: '第三篇測試文章',
-        //     score: -3.75,
-        //   ),
-        // ];
-        // navigationService.goPostResult(testPosts);
-        _sendPostQuery(postQuery).then((result) {
-          navigationService.goPostResult(result);
-        });
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-      child: const Text('生成發文內容', style: TextStyle(fontSize: 18)),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ElevatedButton(
+          onPressed: () {
+            _buildPostQuery();
+            debugPrint('PostQuery: ${postQuery.toString()}');
+        
+            final navigationService = Provider.of<NavigationService>(context, listen: false);
+            // 測試文章
+            // List<GeneratedPost> testPosts = [
+            //   GeneratedPost(
+            //     content: '這是一篇測試文章內容 1',
+            //     score: 5.6,
+            //   ),
+            //   GeneratedPost(
+            //     content: '這是第二篇測試文章內容',
+            //     score: 0.85,
+            //   ),
+            //   GeneratedPost(
+            //     content: '第三篇測試文章',
+            //     score: -3.75,
+            //   ),
+            // ];
+            // navigationService.goPostResult(testPosts);
+            _sendPostQuery(postQuery).then((result) {
+              if (result.isEmpty) {
+                setState(() {
+                  _errorMessage = '生成文章失敗，請稍後再試';
+                });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('生成文章失敗，請稍後再試'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+              setState(() {
+                _errorMessage = '';
+              });
+              navigationService.goPostResult(result);
+            });
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.deepPurple,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          child: const Text('生成發文內容', style: TextStyle(fontSize: 18)),
+        ),
+        if (_errorMessage.isNotEmpty) 
+          Padding(
+            padding: const EdgeInsets.only(top: 12.0),
+            child: Text(
+              _errorMessage,
+              style: const TextStyle(color: Colors.red, fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+          ),
+      ],
     );
   }
 
@@ -218,25 +256,36 @@ class _PostState extends State<Post> {
     postQuery.withInDays = _selectedDays;
     postQuery.size = _selectedSize;
     postQuery.gclikes = _selectedLikes;
-    postQuery.returnCount = 3; // TODO: Get selected return count
+    postQuery.returnCount = _selectedCount;
     // 根據 _selectedTone (name) 找到對應的 ToneOption 並設置 tone
     final toneOption = options.firstWhere(
       (tone) => tone.name == _selectedTone,
       orElse: () => ToneOption('', _selectedTone, ''),
     ).id;
     postQuery.tone = toneOption;
+    if(toneOption == 'Custom') {
+      postQuery.specificUser = _selectedTone;
+    } else {
+      postQuery.specificUser = '';
+    }
   }
 
   Future<List<GeneratedPost>> _sendPostQuery(PostQuery query) async {
-    await changeTone(tone: query.tone);
-    return await generatePost(
-      userquery: query.userQuery,
-      tag: query.tag,
-      style: query.style,
-      withindays: query.withInDays,
-      size: query.size,
-      gclikes: query.gclikes,
-      topK: query.returnCount,
-    );
+    try{
+      await changeTone(tone: query.tone);
+      return await generatePost(
+        userquery: query.userQuery,
+        tag: query.tag,
+        style: query.style,
+        withindays: query.withInDays,
+        size: query.size,
+        gclikes: query.gclikes,
+        recommendation: query.returnCount,
+        specific_user: query.specificUser,
+      );
+    } catch (e) {
+      print('發生錯誤: $e');
+      return [];
+    }
   }
 }

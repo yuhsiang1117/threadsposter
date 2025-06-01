@@ -48,7 +48,7 @@ class _PostResultState extends State<PostResult> {
             children: [
               const SizedBox(height: 8),
               // 顯示三個生成結果
-              for (int i = 0; i < 3; i++) ...[
+              for (int i = 0; i < currentResult.length; i++) ...[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -95,9 +95,9 @@ class _PostResultState extends State<PostResult> {
                       color: Colors.white,
                       border: Border.all(
                         color: (currentResult.length > i)
-                          ? (currentResult[i].score > 5
+                          ? (currentResult[i].score >= 0.67
                           ? Colors.green
-                          : (currentResult[i].score >= 0
+                          : (currentResult[i].score >= 0.33
                             ? Colors.orange
                             : Colors.red))
                           : Colors.purple,
@@ -110,9 +110,9 @@ class _PostResultState extends State<PostResult> {
                       style: TextStyle(
                         fontSize: 12,
                         color: (currentResult.length > i)
-                          ? (currentResult[i].score > 5
+                          ? (currentResult[i].score >= 0.67
                           ? Colors.green
-                          : (currentResult[i].score >= 0
+                          : (currentResult[i].score >= 0.33
                             ? Colors.orange
                             : Colors.red))
                           : Colors.purple,
