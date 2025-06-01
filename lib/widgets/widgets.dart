@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 // Home
 export 'package:threadsposter/widgets/home/dailypop.dart';
 export 'package:threadsposter/widgets/home/home_page.dart';
-export 'package:threadsposter/widgets/home_page.dart';
 // Post
-export 'package:threadsposter/widgets/post/generation.dart';
 export 'package:threadsposter/widgets/post/post_page.dart';
+export 'package:threadsposter/widgets/post/post_result_page.dart';
 
 export 'package:threadsposter/widgets/post/selection_widget/style_selection.dart';
 export 'package:threadsposter/widgets/post/selection_widget/size_selection.dart';

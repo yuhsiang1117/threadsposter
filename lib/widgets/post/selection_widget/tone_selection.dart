@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:threadsposter/models/data_lists.dart';
 
 String selectedTone = '';
@@ -35,6 +36,7 @@ class _ToneSelectionState extends State<ToneSelection> {
   }
 
   Widget _buildToneSelector() {
+    final toneOptions = Provider.of<ToneProvider>(context, listen: false).tones;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(

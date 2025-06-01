@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:threadsposter/models/data_lists.dart';
 import 'package:threadsposter/services/navigation.dart';
 
 void main() {
@@ -7,6 +8,7 @@ void main() {
     MultiProvider(
       providers: [
         Provider<NavigationService>(create: (context) => NavigationService()),
+        ChangeNotifierProvider<ToneProvider>(create: (_) => ToneProvider()),
       ],
       child: const App(),
     ),

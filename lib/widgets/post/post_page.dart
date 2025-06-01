@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:threadsposter/models/data_lists.dart';
 import 'package:threadsposter/services/navigation.dart';
 import 'package:threadsposter/widgets/widgets.dart';
 import 'package:threadsposter/models/post_query.dart';
+import 'package:threadsposter/services/api.dart';
 
 String currentTone = '';
 
@@ -177,15 +179,27 @@ class _PostState extends State<Post> {
         print('=======================');
         print(postQuery.toJson());
         print('=======================');
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          builder:
-              (context) => SizedBox(
-                height: MediaQuery.of(context).size.height * 0.8,
-                child: const Generation(),
-              ),
-        );
+
+        final navigationService = Provider.of<NavigationService>(context, listen: false);
+        // 測試文章
+        // List<GeneratedPost> testPosts = [
+        //   GeneratedPost(
+        //     content: '這是一篇測試文章內容 1',
+        //     score: 5.6,
+        //   ),
+        //   GeneratedPost(
+        //     content: '這是第二篇測試文章內容',
+        //     score: 0.85,
+        //   ),
+        //   GeneratedPost(
+        //     content: '第三篇測試文章',
+        //     score: -3.75,
+        //   ),
+        // ];
+        // navigationService.goPostResult(testPosts);
+        _sendPostQuery(postQuery).then((result) {
+          navigationService.goPostResult(result);
+        });
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.deepPurple,
@@ -205,6 +219,24 @@ class _PostState extends State<Post> {
     postQuery.size = _selectedSize;
     postQuery.gclikes = _selectedLikes;
     postQuery.returnCount = 3; // TODO: Get selected return count
-    postQuery.tone = _selectedTone;
+    // 根據 _selectedTone (name) 找到對應的 ToneOption 並設置 tone
+    final toneOption = options.firstWhere(
+      (tone) => tone.name == _selectedTone,
+      orElse: () => ToneOption('', _selectedTone, ''),
+    ).id;
+    postQuery.tone = toneOption;
+  }
+
+  Future<List<GeneratedPost>> _sendPostQuery(PostQuery query) async {
+    await changeTone(tone: query.tone);
+    return await generatePost(
+      userquery: query.userQuery,
+      tag: query.tag,
+      style: query.style,
+      withindays: query.withInDays,
+      size: query.size,
+      gclikes: query.gclikes,
+      topK: query.returnCount,
+    );
   }
 }

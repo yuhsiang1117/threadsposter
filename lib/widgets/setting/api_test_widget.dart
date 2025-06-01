@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:threadsposter/api.dart';
+import 'package:threadsposter/services/api.dart';
 
 class ApiTestWidget extends StatefulWidget {
   const ApiTestWidget({super.key});
