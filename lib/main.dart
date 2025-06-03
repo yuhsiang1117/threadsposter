@@ -47,6 +47,7 @@ void main() async{
       providers: [
         Provider<NavigationService>(create: (context) => NavigationService()),
         ChangeNotifierProvider<ToneProvider>(create: (_) => ToneProvider()),
+        ChangeNotifierProvider<PostQueryProvider>(create: (_) => PostQueryProvider()),
       ],
       child: const App(),
     ),

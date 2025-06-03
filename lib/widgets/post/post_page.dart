@@ -150,7 +150,7 @@ class _PostState extends State<Post> {
             const SizedBox(height: 20),
             _buildQueryInputField(),
             const SizedBox(height: 20),
-            _buildGenerateButton(context),
+            _buildGenerateButton(),
           ],
         ),
       ),
