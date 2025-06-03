@@ -3,7 +3,8 @@ import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:threadsposter/services/navigation.dart';
-import 'package:threadsposter/widgets/setting/history_page.dart';
+import 'package:threadsposter/widgets/setting/history.dart';
+import 'package:threadsposter/widgets/setting/notification.dart';
 import 'package:threadsposter/widgets/setting/api_test_widget.dart';
 import 'edit_profile.dart';
 class Setting extends StatefulWidget {
@@ -123,7 +124,12 @@ class Setting extends StatefulWidget {
             _buildMenuItem(
               icon: Icons.notifications,
               title: '通知設定',
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const NotificationPage()),
+                );
+              },
             ),
             _buildDivider(),
             _buildMenuItem(
