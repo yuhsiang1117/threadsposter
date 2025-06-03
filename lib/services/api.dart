@@ -22,7 +22,8 @@ Future<List<GeneratedPost>> generatePost({
   required int withindays,
   required int size,
   required int gclikes,
-  required int topK,
+  required int recommendation,
+  required String specific_user,
   http.Client? client,
 }) async {
   final httpClient = client ?? http.Client();
@@ -37,7 +38,8 @@ Future<List<GeneratedPost>> generatePost({
       'size': size,
       'withindays': withindays,
       'gclikes': gclikes,
-      'top_k': topK,
+      'recommendation': recommendation,
+      'specific_user': specific_user,
     }),
   );
   final json = jsonDecode(response.body);

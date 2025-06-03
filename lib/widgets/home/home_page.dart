@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:threadsposter/widgets/widgets.dart';
@@ -6,6 +8,7 @@ import 'package:threadsposter/models/data_lists.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
 
 int currentPage = 0;
+String customTone = '';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -15,10 +18,35 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  final TextEditingController _customToneController = TextEditingController();
+
+  @override
+  void initState() {
+    debugPrint('[lib/widgets/home/home_page.dart] Home Page Initializing...');
+    super.initState();
+    Future.microtask((){
+      // ignore: use_build_context_synchronously
+      Provider.of<ToneProvider>(context, listen: false).fetchTones();
+    });
+  }
+
+  @override
+  void dispose() {
+    _customToneController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final InfiniteScrollController carouselController = InfiniteScrollController(initialItem: currentPage);
+    final toneOptions = Provider.of<ToneProvider>(context).tones;
+    _customToneController.text = customTone;
+
+    // 如果沒有載入語氣選項，顯示載入中指示器
+    if(toneOptions.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
     
     return Scaffold(
       appBar: AppBar(
@@ -38,41 +66,90 @@ class _HomeState extends State<Home> {
       ),
       body: Column(
         children: [
-          // 2/3 for角色選擇
           Expanded(
-            flex: 2,
+            flex: 6,
             child: Container(
+              width: screenWidth,
+              height: screenWidth,
               padding: const EdgeInsets.fromLTRB(30, 20, 30, 0),
               alignment: Alignment.center,
-                child: InfiniteCarousel.builder(
-                  itemCount: toneOptions.length,
-                  controller: carouselController,
-                  onIndexChanged: (index) {
-                    setState(() {
-                    currentPage = index;
-                    });
-                  },
-                  itemBuilder: (context, itemIndex, realIndex) {
-                    return Dailypop(
-                    screenWidth: screenWidth,
-                    index: itemIndex,
-                    );
-                  },
-                  itemExtent: 300,
-                  loop: true,
-                ),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final double itemWidth = constraints.maxWidth;
+                  return ScrollConfiguration(
+                    behavior: const ScrollBehavior().copyWith(
+                      dragDevices: {PointerDeviceKind.touch, PointerDeviceKind.mouse, PointerDeviceKind.trackpad},  
+                    ),
+                    child: InfiniteCarousel.builder(
+                      itemCount: toneOptions.length,
+                      controller: carouselController,
+                      onIndexChanged: (index) {
+                        setState(() {
+                          currentPage = index;
+                        });
+                      },
+                      itemBuilder: (context, itemIndex, realIndex) {
+                        return SizedBox(
+                          width: double.infinity, // 讓每個item寬度等於螢幕寬
+                          child: Dailypop(
+                            screenWidth: screenWidth,
+                            index: itemIndex,
+                          ),
+                        );
+                      },
+                      itemExtent: itemWidth, // 讓每個item高度等於螢幕高度
+                      loop: true,
+                    ),
+                  );
+                }
               ),
             ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: Text(
+          ),
+            Expanded(
+            flex: 1,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: currentPage == toneOptions.length - 1
+                ? Center(
+                  child: SizedBox(
+                  width: screenWidth * 0.6,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '@',
+                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: TextField(
+                          controller: _customToneController,
+                          onChanged: (value) {
+                            setState(() {
+                            customTone = value;
+                            });
+                          },
+                          decoration: const InputDecoration(
+                            hintText: '請輸入UserID',
+                            border: OutlineInputBorder(),
+                            isDense: true,
+                            contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                          ),
+                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                  ),
+                )
+              : Text(
                 toneOptions[currentPage].name,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
             ),
           ),
-          // 1/3 for角色說明
           Expanded(
-            flex: 1,
+            flex: 3,
             child: Container(
               width: double.infinity,
               color: Colors.grey[100],

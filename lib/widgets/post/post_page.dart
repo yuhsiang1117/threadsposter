@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:threadsposter/models/data_lists.dart';
 import 'package:threadsposter/services/navigation.dart';
 import 'package:threadsposter/services/post_query_provider.dart';
 import 'package:threadsposter/widgets/widgets.dart';
 import 'package:threadsposter/models/post_query.dart';
+import 'package:threadsposter/services/api.dart';
 
 String currentTone = '';
 
@@ -24,6 +26,8 @@ class _PostState extends State<Post> {
   int _selectedSize = parseSize("Short");
   int _selectedDays = 15;
   int _selectedLikes = 1000;
+  int _selectedCount = 3;
+  String _errorMessage = '';
 
   PostQuery postQuery = PostQuery(
     userQuery: '',
@@ -34,6 +38,7 @@ class _PostState extends State<Post> {
     gclikes: 1000,
     returnCount: 3,
     tone: 'None',
+    specificUser: '',
   );
 
   @override
@@ -116,17 +121,25 @@ class _PostState extends State<Post> {
                   SizedBox(height: 10),
                   DaysSlider(
                     onDaysSelected: (days) {
-                    setState(() {
-                      _selectedDays = days;
-                    });
+                      setState(() {
+                        _selectedDays = days;
+                      });
                     },
                   ),
                   const SizedBox(height: 10),
                   LikesSlider(
                     onLikesSelected: (likes) {
-                    setState(() {
-                      _selectedLikes = likes;
-                    });
+                      setState(() {
+                        _selectedLikes = likes;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                  CountSlider(
+                    onCountSelected: (count) {
+                      setState(() {
+                        _selectedCount = count;
+                      });
                     },
                   ),
                 ],
@@ -171,31 +184,69 @@ class _PostState extends State<Post> {
     );
   }
 
-  Widget _buildGenerateButton(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {
-        _buildPostQuery();
-        Provider.of<PostQueryProvider>(context, listen:false).addQuery(postQuery);
-        print('=======================');
-        print(postQuery.toJson());
-        print('=======================');
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          builder:
-              (context) => SizedBox(
-                height: MediaQuery.of(context).size.height * 0.8,
-                child: const Generation(),
-              ),
-        );
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-      child: const Text('生成發文內容', style: TextStyle(fontSize: 18)),
+  Widget _buildGenerateButton() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ElevatedButton(
+          onPressed: () {
+            _buildPostQuery();
+            debugPrint('PostQuery: ${postQuery.toString()}');
+        
+            final navigationService = Provider.of<NavigationService>(context, listen: false);
+            // 測試文章
+            // List<GeneratedPost> testPosts = [
+            //   GeneratedPost(
+            //     content: '這是一篇測試文章內容 1',
+            //     score: 5.6,
+            //   ),
+            //   GeneratedPost(
+            //     content: '這是第二篇測試文章內容',
+            //     score: 0.85,
+            //   ),
+            //   GeneratedPost(
+            //     content: '第三篇測試文章',
+            //     score: -3.75,
+            //   ),
+            // ];
+            // navigationService.goPostResult(testPosts);
+            _sendPostQuery(postQuery).then((result) {
+              if (result.isEmpty) {
+                setState(() {
+                  _errorMessage = '生成文章失敗，請稍後再試';
+                });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('生成文章失敗，請稍後再試'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+              setState(() {
+                _errorMessage = '';
+              });
+              navigationService.goPostResult(result);
+            });
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.deepPurple,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          child: const Text('生成發文內容', style: TextStyle(fontSize: 18)),
+        ),
+        if (_errorMessage.isNotEmpty) 
+          Padding(
+            padding: const EdgeInsets.only(top: 12.0),
+            child: Text(
+              _errorMessage,
+              style: const TextStyle(color: Colors.red, fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+          ),
+      ],
     );
   }
 
@@ -206,7 +257,36 @@ class _PostState extends State<Post> {
     postQuery.withInDays = _selectedDays;
     postQuery.size = _selectedSize;
     postQuery.gclikes = _selectedLikes;
-    postQuery.returnCount = 3; // TODO: Get selected return count
-    postQuery.tone = _selectedTone;
+    postQuery.returnCount = _selectedCount;
+    // 根據 _selectedTone (name) 找到對應的 ToneOption 並設置 tone
+    final toneOption = options.firstWhere(
+      (tone) => tone.name == _selectedTone,
+      orElse: () => ToneOption('', _selectedTone, ''),
+    ).id;
+    postQuery.tone = toneOption;
+    if(toneOption == 'Custom') {
+      postQuery.specificUser = _selectedTone;
+    } else {
+      postQuery.specificUser = '';
+    }
+  }
+
+  Future<List<GeneratedPost>> _sendPostQuery(PostQuery query) async {
+    try{
+      await changeTone(tone: query.tone);
+      return await generatePost(
+        userquery: query.userQuery,
+        tag: query.tag,
+        style: query.style,
+        withindays: query.withInDays,
+        size: query.size,
+        gclikes: query.gclikes,
+        recommendation: query.returnCount,
+        specific_user: query.specificUser,
+      );
+    } catch (e) {
+      print('發生錯誤: $e');
+      return [];
+    }
   }
 }

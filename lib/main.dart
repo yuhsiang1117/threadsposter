@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:threadsposter/models/data_lists.dart';
 import 'package:threadsposter/services/navigation.dart';
 import 'package:threadsposter/services/post_query_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -45,9 +46,7 @@ void main() async{
     MultiProvider(
       providers: [
         Provider<NavigationService>(create: (context) => NavigationService()),
-        ChangeNotifierProvider<PostQueryProvider>(
-          create: (context) => PostQueryProvider(),
-        ),
+        ChangeNotifierProvider<ToneProvider>(create: (_) => ToneProvider()),
       ],
       child: const App(),
     ),

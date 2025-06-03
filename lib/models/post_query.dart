@@ -8,6 +8,7 @@ class PostQuery {
   int gclikes;
   int returnCount;
   String tone;
+  String specificUser = '';
 
   PostQuery({
     required this.userQuery,
@@ -18,11 +19,12 @@ class PostQuery {
     required this.gclikes,
     required this.returnCount,
     required this.tone,
+    required this.specificUser
   });
 
   @override
   String toString() {
-    return 'PostQuery(userQuery: $userQuery, tag: $tag, style: $style, withInDays: $withInDays, size: $size, gclikes: $gclikes, returnCount: $returnCount, tone: $tone)';
+    return 'PostQuery(userQuery: $userQuery, tag: $tag, style: $style, withInDays: $withInDays, size: $size, gclikes: $gclikes, returnCount: $returnCount, tone: $tone, specificUser: $specificUser)';
   }
   Map<String, dynamic> toJson() {
     return {
@@ -34,6 +36,7 @@ class PostQuery {
       'gclikes': gclikes,
       'returnCount': returnCount,
       'tone': tone,
+      'specificUser': specificUser,
     };
   }
 }
