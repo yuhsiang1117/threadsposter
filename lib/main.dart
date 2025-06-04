@@ -35,13 +35,32 @@ Future<void> requestPermissions() async {
     await Permission.notification.request();
   }
 }
-void main() async{
+void main() async {
+  // 確保 WidgetsFlutterBinding 已初始化
+  // 這是 Flutter 的一個必要步驟，特別是在使用通知或其他需要平台通道的功能時
   WidgetsFlutterBinding.ensureInitialized();
-  await initializeNotifications();
-  await requestPermissions();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  debugPrint('[main] 初始化開始');
+  try {
+    await initializeNotifications().timeout(const Duration(seconds: 5));
+    debugPrint('[main] 通知初始化完成');
+  } catch (e) {
+    debugPrint('[main] 通知初始化失敗: $e');
+  }
+  try {
+    await requestPermissions().timeout(const Duration(seconds: 5));
+    debugPrint('[main] 權限請求完成');
+  } catch (e) {
+    debugPrint('[main] 權限請求失敗: $e');
+  }
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    ).timeout(const Duration(seconds: 5));
+    debugPrint('[main] Firebase 初始化完成');
+  } catch (e) {
+    debugPrint('[main] Firebase 初始化失敗: $e');
+  }
+  debugPrint('[main] Firebase 初始化完成');
   runApp(
     MultiProvider(
       providers: [

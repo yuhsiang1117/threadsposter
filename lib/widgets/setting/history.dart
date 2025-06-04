@@ -47,8 +47,7 @@ class HistoryPage extends StatelessWidget {
                       const SizedBox(height: 8),
                       Text('標籤（Tag）： ${query.tag}', style: TextStyle(color: Colors.grey[700])),
                       Text('風格（Style）： ${query.style}', style: TextStyle(color: Colors.grey[700])),
-                      if (query.tone != null)
-                        Text('語氣（Tone）： ${query.tone}'),
+                      Text('語氣（Tone）： ${query.tone}'),
                       
                     ],
                   ),

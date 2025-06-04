@@ -20,10 +20,10 @@ class ToneProvider with ChangeNotifier {
 }
 
 List<ToneOption> options = [
-  ToneOption('None', '無', '無特定角色'),
-  ToneOption('Boss', '總裁', '老闆風格，權威且直接'),
-  ToneOption('Simp', '暈船仔', '討好型，溫柔且諂媚'),
-  ToneOption('Custom', '', '自訂帳號風格'),
+  ToneOption('none', '無', '無特定角色'),
+  ToneOption('boss', '總裁', '老闆風格，權威且直接'),
+  ToneOption('simp', '暈船仔', '討好型，溫柔且諂媚'),
+  ToneOption('custom', '', '自訂帳號風格'),
 ];
 
 Future<List<ToneOption>> updateToneOptions() async {

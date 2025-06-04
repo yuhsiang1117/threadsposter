@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:threadsposter/services/navigation.dart';
 import 'package:threadsposter/widgets/widgets.dart';
 
 enum HomeTab {
