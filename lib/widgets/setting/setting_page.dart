@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:threadsposter/services/navigation.dart';
 import 'package:threadsposter/widgets/setting/history.dart';
 import 'package:threadsposter/widgets/setting/notification.dart';
+import 'package:threadsposter/widgets/setting/google_sign_in.dart';
 import 'package:threadsposter/widgets/setting/api_test_widget.dart';
 import 'edit_profile.dart';
 class Setting extends StatefulWidget {
@@ -158,7 +159,14 @@ class Setting extends StatefulWidget {
             _buildMenuItem(
               icon: Icons.logout,
               title: '登出',
-              onTap: () {},
+              onTap: () async {
+                try {
+                  final userCredential = await signInWithGoogle();
+                } catch (e, stack) {
+                  print('登入失敗: $e');
+                  print('stack trace: $stack');
+                }
+              },
               textColor: Colors.red,
             ),
           ],
