@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:threadsposter/models/data_lists.dart';
 import 'package:threadsposter/services/navigation.dart';
+import 'package:threadsposter/services/post_query_provider.dart';
 import 'package:threadsposter/widgets/widgets.dart';
 import 'package:threadsposter/models/post_query.dart';
 import 'package:threadsposter/services/api.dart';
