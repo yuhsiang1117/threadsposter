@@ -26,30 +26,22 @@ class Dailypop extends StatelessWidget {
         }
         navigationService.goPost(tone: toneOptions[index].name);
       },
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Colors.deepPurple,
-              Colors.purpleAccent,
-            ],
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.secondary,
+            border: Border.all(
+              color: Theme.of(context).colorScheme.primary,
+              width: 4.0,
+            ),
+            borderRadius: BorderRadius.circular(20),
           ),
-          borderRadius: BorderRadius.circular(24),
-        ),
-        padding: const EdgeInsets.all(4),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: Container(
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 90, 90, 90),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Image.asset(
-                'assets/images/${toneOptions[index].id}.png',
-              width: screenWidth,
-              height: screenWidth,
-              fit: BoxFit.cover,
-            ),
+          child: Image.asset(
+              'assets/images/${toneOptions[index].id}.png',
+            width: screenWidth,
+            height: screenWidth,
+            fit: BoxFit.cover,
           ),
         ),
       ),
