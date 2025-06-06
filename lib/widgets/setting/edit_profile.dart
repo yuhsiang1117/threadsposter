@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
+import 'package:threadsposter/services/UserData_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
 
@@ -15,8 +17,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   void initState() {
     super.initState();
     // 預設值可從使用者資料帶入
-    _nameController.text = '使用者名稱';
-    _emailController.text = 'user@example.com';
+    _nameController.text = context.read<UserDataProvider>().userinfo?['name'];
+    _emailController.text = context.read<UserDataProvider>().userinfo?['email'];
   }
 
   @override
@@ -26,19 +28,22 @@ class _EditProfilePageState extends State<EditProfilePage> {
     super.dispose();
   }
 
-  void _saveProfile() {
+  void _saveProfile() async {
   final name = _nameController.text.trim();
   final email = _emailController.text.trim();
-
+  final uid = context.read<UserDataProvider>().uid;
   ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('個人資料已儲存')),
     );
-
-  Navigator.pop(context, {
-    'name': name,
-    'email': email,
-  });
-  
+  FirebaseFirestore.instance.collection('users').doc(uid).collection('profile').doc('info').set({
+    'name':name,
+    'email':email,
+  },SetOptions(merge: true));
+  if (context.mounted) {
+      context.read<UserDataProvider>().refreshData();
+  }
+  await Future.delayed(Duration(seconds: 1));
+  Navigator.pop(context);
 }
 
   @override
@@ -54,7 +59,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             TextField(
               controller: _nameController,
               decoration: const InputDecoration(
-                labelText: '新的姓名',
+                labelText: '新的暱稱',
                 border: OutlineInputBorder(),
               ),
             ),

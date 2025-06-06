@@ -8,6 +8,12 @@ final routerConfig = GoRouter(
   debugLogDiagnostics: true,
   routes: <RouteBase>[
     GoRoute(
+      path: '/login',
+      pageBuilder: (context, state) => const NoTransitionPage<void>(
+        child: Setting()
+      ),
+    ),
+    GoRoute(
       path: '/home',
       pageBuilder: (context, state) => const NoTransitionPage<void>(
         child: Home()

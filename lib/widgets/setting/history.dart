@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:threadsposter/services/post_query_provider.dart';
+import 'package:threadsposter/services/UserData_provider.dart';
 import 'package:threadsposter/services/navigation.dart';
 
 class HistoryPage extends StatelessWidget {
@@ -8,7 +8,7 @@ class HistoryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final queries = context.watch<PostQueryProvider>().queries;
+    final queries = context.watch<UserDataProvider>().queries;
 
     return Scaffold(
       appBar: AppBar(
