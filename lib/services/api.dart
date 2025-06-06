@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -15,6 +16,15 @@ class GeneratedPost {
   }
 }
 
+const String apiHost = String.fromEnvironment('API_HOST', defaultValue: 'localhost');
+String getApiBaseUrl() {
+  if(defaultTargetPlatform == TargetPlatform.android ||
+     defaultTargetPlatform == TargetPlatform.iOS) {
+    return 'http://10.0.2.2:8000';
+  }
+  return 'http://$apiHost:8000'; // FastAPI API
+}
+
 Future<List<GeneratedPost>> generatePost({
   required String userquery,
   required String tag,
@@ -27,7 +37,53 @@ Future<List<GeneratedPost>> generatePost({
   http.Client? client,
 }) async {
   final httpClient = client ?? http.Client();
-  final url = Uri.parse('http://localhost:8000/generate'); // FastAPI API
+  final url = Uri.parse('${getApiBaseUrl()}/generate'); // FastAPI API
+  final response = await httpClient.post(
+    url,
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      'userquery': userquery,
+      'style': style,
+      'tag': tag,
+      'size': size,
+      'withindays': withindays,
+      'gclikes': gclikes,
+      'recommendation': recommendation,
+      'specific_user': specific_user,
+    }),
+  );
+  final json = jsonDecode(response.body);
+  if (response.statusCode != 200) {
+    throw Exception('HTTP 錯誤：${response.statusCode}');
+  }
+  if (client == null) {
+    httpClient.close();
+  }
+  if (json['success'] == true) {
+    List<dynamic> rawPosts = json['post'];
+    return rawPosts
+        .map((rp) => GeneratedPost.fromList((rp) as List<dynamic>))
+        .toList();
+  } else {
+    throw Exception('API 錯誤：${json["error"]}');
+  }
+
+  // Close the client if we created it internally
+}
+
+Future<List<GeneratedPost>> generateSpecificUserPost({
+  required String userquery,
+  required String tag,
+  required String style,
+  required int withindays,
+  required int size,
+  required int gclikes,
+  required int recommendation,
+  required String specific_user,
+  http.Client? client,
+}) async {
+  final httpClient = client ?? http.Client();
+  final url = Uri.parse('${getApiBaseUrl()}/generate'); // FastAPI API
   final response = await httpClient.post(
     url,
     headers: {'Content-Type': 'application/json'},
@@ -63,7 +119,7 @@ Future<List<GeneratedPost>> generatePost({
 
 Future<bool> changeTone({required String tone, http.Client? client}) async {
   final httpClient = client ?? http.Client();
-  final url = Uri.parse('http://localhost:8000/tone'); // FastAPI API
+  final url = Uri.parse('${getApiBaseUrl()}/tone'); // FastAPI API
   final response = await httpClient.post(
     url,
     body: jsonEncode({'tone': tone}),
@@ -81,7 +137,7 @@ Future<bool> changeTone({required String tone, http.Client? client}) async {
 
 Future<List<String>> getTone({http.Client? client}) async {
   final httpClient = client ?? http.Client();
-  final url = Uri.parse('http://localhost:8000/styles'); // FastAPI API
+  final url = Uri.parse('${getApiBaseUrl()}/styles'); // FastAPI API
   final response = await httpClient.get(
     url,
     headers: {'Content-Type': 'application/json'},
@@ -102,7 +158,7 @@ Future<List<String>> getTone({http.Client? client}) async {
 
 Future<bool> post({required String text, http.Client? client}) async {
   final httpClient = client ?? http.Client();
-  final url = Uri.parse('http://localhost:8000/post'); // FastAPI API
+  final url = Uri.parse('${getApiBaseUrl()}/post'); // FastAPI API
   final response = await httpClient.post(
     url,
     body: jsonEncode({'text': text}),
@@ -120,7 +176,7 @@ Future<bool> post({required String text, http.Client? client}) async {
 
 Future<List<String>> getAvailableTones({http.Client? client}) async {
   final httpClient = client ?? http.Client();
-  final url = Uri.parse('http://localhost:8000/valid_tone'); // FastAPI API
+  final url = Uri.parse('${getApiBaseUrl()}/valid_tone'); // FastAPI API
   final response = await httpClient.get(
     url,
     headers: {'Content-Type': 'application/json'},

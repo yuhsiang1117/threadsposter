@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:threadsposter/models/data_lists.dart';
 import 'package:threadsposter/services/navigation.dart';
-import 'package:threadsposter/services/post_query_provider.dart';
 import 'package:threadsposter/widgets/widgets.dart';
 import 'package:threadsposter/models/post_query.dart';
 import 'package:threadsposter/services/api.dart';
@@ -19,6 +18,7 @@ class Post extends StatefulWidget {
 class _PostState extends State<Post> {
   final TextEditingController _tagsController = TextEditingController();
   final TextEditingController _queryController = TextEditingController();
+  bool _isGenerating = false;
 
   String _selectedStyle = 'Emotion';
   String _selectedTone = 'None';
@@ -189,7 +189,12 @@ class _PostState extends State<Post> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         ElevatedButton(
-          onPressed: () {
+          onPressed: _isGenerating 
+            ? null 
+            : () {
+            setState(() {
+              _isGenerating = true;
+            });
             _buildPostQuery();
             debugPrint('PostQuery: ${postQuery.toString()}');
         
@@ -211,6 +216,9 @@ class _PostState extends State<Post> {
             // ];
             // navigationService.goPostResult(testPosts);
             _sendPostQuery(postQuery).then((result) {
+              setState(() {
+                _isGenerating = false;
+              });
               if (result.isEmpty) {
                 setState(() {
                   _errorMessage = '生成文章失敗，請稍後再試';
@@ -230,12 +238,14 @@ class _PostState extends State<Post> {
             });
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.deepPurple,
+            backgroundColor: _isGenerating? Colors.grey : Colors.deepPurple,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
-          child: const Text('生成發文內容', style: TextStyle(fontSize: 18)),
+          child: _isGenerating 
+            ? const CircularProgressIndicator(color: Colors.white)
+            : const Text('生成發文內容', style: TextStyle(fontSize: 18)),
         ),
         if (_errorMessage.isNotEmpty) 
           Padding(

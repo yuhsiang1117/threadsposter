@@ -19,11 +19,13 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final TextEditingController _customToneController = TextEditingController();
+  late final InfiniteScrollController carouselController;
 
   @override
   void initState() {
     debugPrint('[lib/widgets/home/home_page.dart] Home Page Initializing...');
     super.initState();
+    carouselController = InfiniteScrollController(initialItem: currentPage);
     Future.microtask((){
       // ignore: use_build_context_synchronously
       Provider.of<ToneProvider>(context, listen: false).fetchTones();
@@ -39,7 +41,6 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-    final InfiniteScrollController carouselController = InfiniteScrollController(initialItem: currentPage);
     final toneOptions = Provider.of<ToneProvider>(context).tones;
     _customToneController.text = customTone;
 
@@ -71,7 +72,7 @@ class _HomeState extends State<Home> {
             child: Container(
               width: screenWidth,
               height: screenWidth,
-              padding: const EdgeInsets.fromLTRB(30, 20, 30, 0),
+              padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
               alignment: Alignment.center,
               child: LayoutBuilder(
                 builder: (context, constraints) {
@@ -83,10 +84,14 @@ class _HomeState extends State<Home> {
                     child: InfiniteCarousel.builder(
                       itemCount: toneOptions.length,
                       controller: carouselController,
+                      velocityFactor: 0.02,
+                      itemExtent: itemWidth, // 讓每個item高度等於螢幕高度
+                      loop: true,
                       onIndexChanged: (index) {
                         setState(() {
                           currentPage = index;
                         });
+                        // carouselController.animateToItem(index, duration: Duration(milliseconds: 300), curve: Curves.elasticOut);
                       },
                       itemBuilder: (context, itemIndex, realIndex) {
                         return SizedBox(
@@ -97,8 +102,6 @@ class _HomeState extends State<Home> {
                           ),
                         );
                       },
-                      itemExtent: itemWidth, // 讓每個item高度等於螢幕高度
-                      loop: true,
                     ),
                   );
                 }
@@ -109,42 +112,72 @@ class _HomeState extends State<Home> {
             flex: 1,
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: currentPage == toneOptions.length - 1
-                ? Center(
-                  child: SizedBox(
-                  width: screenWidth * 0.6,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '@',
-                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: TextField(
-                          controller: _customToneController,
-                          onChanged: (value) {
-                            setState(() {
-                            customTone = value;
-                            });
-                          },
-                          decoration: const InputDecoration(
-                            hintText: '請輸入UserID',
-                            border: OutlineInputBorder(),
-                            isDense: true,
-                            contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // 上一頁按鈕
+                  // IconButton(
+                  // icon: const Icon(Icons.arrow_back),
+                  // onPressed: () {
+                  //   int prevPage = (currentPage - 1 + toneOptions.length) % toneOptions.length;
+                  //   print('$currentPage -> $prevPage');
+                  //   carouselController.animateToItem(prevPage, duration: Duration(milliseconds: 1000), curve: Curves.elasticOut);
+                  // },
+                  // ),
+                  // const SizedBox(width: 8),
+                  // 內容區塊
+                  Expanded(
+                    child: currentPage == toneOptions.length - 1
+                      ? Center(
+                        child: SizedBox(
+                        width: screenWidth * 0.6,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                          Text(
+                            '@',
+                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                           ),
-                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: TextField(
+                            controller: _customToneController,
+                            onChanged: (value) {
+                              setState(() {
+                              customTone = value;
+                              });
+                            },
+                            decoration: const InputDecoration(
+                              hintText: '請輸入UserID',
+                              border: OutlineInputBorder(),
+                              isDense: true,
+                              contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                            ),
+                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          ],
                         ),
                       ),
-                    ],
+                    )
+                    : Center(
+                      child: Text(
+                        toneOptions[currentPage].name,
+                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                    ),
                   ),
-                  ),
-                )
-              : Text(
-                toneOptions[currentPage].name,
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                // const SizedBox(width: 8),
+                // // 下一頁按鈕
+                // IconButton(
+                //   icon: const Icon(Icons.arrow_forward),
+                //   onPressed: () {
+                //     int nextPage = (currentPage + 1) % toneOptions.length;
+                //     print('$currentPage -> $nextPage');
+                //     carouselController.animateToItem(nextPage, duration: Duration(milliseconds: 1000), curve: Curves.elasticOut);
+                //   },
+                // ),
+                ],
               ),
             ),
           ),
