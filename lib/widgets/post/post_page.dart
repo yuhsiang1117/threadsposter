@@ -50,110 +50,115 @@ class _PostState extends State<Post> {
 
   @override
   Widget build(BuildContext context) {
+    final toneProvider = Provider.of<ToneProvider>(context);
+    final tones = toneProvider.tones.isNotEmpty ? toneProvider.tones : options;
+    final currentPage = toneProvider.currentPage;
+    final currentTone = tones.isNotEmpty && currentPage < tones.length ? tones[currentPage].name : 'none';
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     _selectedTone = currentTone;
     return Scaffold(
       appBar: AppBar(
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () {
-        final navigationService = Provider.of<NavigationService>(context, listen: false);
-        navigationService.goHome();
-        },
-      ),
-      title: const Text('發文'),
-      backgroundColor: Colors.deepPurple,
-      foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            final navigationService = Provider.of<NavigationService>(context, listen: false);
+            navigationService.goHome();
+          },
+        ),
+        title: Text('發文', style: theme.textTheme.titleLarge?.copyWith(color: colorScheme.onPrimary)),
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
+        elevation: 2,
       ),
       body: Padding(
-      padding: const EdgeInsets.all(20),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Text(
-                  '目前選擇角色：',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                Text(
-                  _selectedTone,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.deepPurple,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            StyleSelection(
-              onStyleSelected: (style) {
-                setState(() {
-                _selectedStyle = style;
-                });
-              },
-            ),
-            const SizedBox(height: 10),
-            SizeSelection(
-              onSizeSelected: (size) {
-                setState(() {
-                _selectedSize = parseSize(size);
-                });
-              },
-            ),
-            const SizedBox(height: 10),
-            Theme(
-              data: Theme.of(context).copyWith(
-                dividerColor: Colors.transparent, // 移除展開後的分隔線
-                splashColor: Colors.transparent,  // 點擊時不出現水波紋
-                highlightColor: Colors.transparent,
-              ),
-              child: ExpansionTile(
-                tilePadding: EdgeInsets.zero,      // 清除 padding（選用）
-                childrenPadding: EdgeInsets.zero,  // 清除展開內容 padding（選用）
-                title: const Text('進階選項'),
+        padding: const EdgeInsets.all(20),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
                 children: [
-                  SizedBox(height: 10),
-                  DaysSlider(
-                    onDaysSelected: (days) {
-                      setState(() {
-                        _selectedDays = days;
-                      });
-                    },
+                  Text(
+                    '目前選擇角色：',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurface,
+                    ),
                   ),
-                  const SizedBox(height: 10),
-                  LikesSlider(
-                    onLikesSelected: (likes) {
-                      setState(() {
-                        _selectedLikes = likes;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  CountSlider(
-                    onCountSelected: (count) {
-                      setState(() {
-                        _selectedCount = count;
-                      });
-                    },
+                  Text(
+                    _selectedTone,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.primary,
+                    ),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 20),
-            _buildTagsInputField(),
-            const SizedBox(height: 20),
-            _buildQueryInputField(),
-            const SizedBox(height: 20),
-            _buildGenerateButton(),
-          ],
+              const SizedBox(height: 10),
+              StyleSelection(
+                onStyleSelected: (style) {
+                  setState(() {
+                    _selectedStyle = style;
+                  });
+                },
+              ),
+              const SizedBox(height: 10),
+              SizeSelection(
+                onSizeSelected: (size) {
+                  setState(() {
+                    _selectedSize = parseSize(size);
+                  });
+                },
+              ),
+              const SizedBox(height: 10),
+              Theme(
+                data: Theme.of(context).copyWith(
+                  dividerColor: Colors.transparent, // 移除展開後的分隔線
+                  splashColor: Colors.transparent,  // 點擊時不出現水波紋
+                  highlightColor: Colors.transparent,
+                ),
+                child: ExpansionTile(
+                  tilePadding: EdgeInsets.zero,      // 清除 padding（選用）
+                  childrenPadding: EdgeInsets.zero,  // 清除展開內容 padding（選用）
+                  title: const Text('進階選項'),
+                  children: [
+                    SizedBox(height: 10),
+                    DaysSlider(
+                      onDaysSelected: (days) {
+                        setState(() {
+                          _selectedDays = days;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    LikesSlider(
+                      onLikesSelected: (likes) {
+                        setState(() {
+                          _selectedLikes = likes;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    CountSlider(
+                      onCountSelected: (count) {
+                        setState(() {
+                          _selectedCount = count;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              _buildTagsInputField(),
+              const SizedBox(height: 20),
+              _buildQueryInputField(),
+              const SizedBox(height: 20),
+              _buildGenerateButton(),
+            ],
+          ),
         ),
-      ),
       ),
     );
   }
@@ -185,6 +190,7 @@ class _PostState extends State<Post> {
   }
 
   Widget _buildGenerateButton() {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -196,50 +202,49 @@ class _PostState extends State<Post> {
               _isGenerating = true;
             });
             _buildPostQuery();
-            debugPrint('PostQuery: ${postQuery.toString()}');
-        
+            debugPrint('PostQuery: \\${postQuery.toString()}');
             final navigationService = Provider.of<NavigationService>(context, listen: false);
-            // 測試文章
-            // List<GeneratedPost> testPosts = [
-            //   GeneratedPost(
-            //     content: '這是一篇測試文章內容 1',
-            //     score: 5.6,
-            //   ),
-            //   GeneratedPost(
-            //     content: '這是第二篇測試文章內容',
-            //     score: 0.85,
-            //   ),
-            //   GeneratedPost(
-            //     content: '第三篇測試文章',
-            //     score: -3.75,
-            //   ),
-            // ];
-            // navigationService.goPostResult(testPosts);
-            _sendPostQuery(postQuery).then((result) {
-              setState(() {
-                _isGenerating = false;
-              });
-              if (result.isEmpty) {
-                setState(() {
-                  _errorMessage = '生成文章失敗，請稍後再試';
-                });
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('生成文章失敗，請稍後再試'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-                return;
-              }
-              setState(() {
-                _errorMessage = '';
-              });
-              navigationService.goPostResult(result);
-            });
+            //測試文章
+            List<GeneratedPost> testPosts = [
+              GeneratedPost(
+                content: '這是一篇測試文章內容 1',
+                score: 5.6,
+              ),
+              GeneratedPost(
+                content: '這是第二篇測試文章內容',
+                score: 0.85,
+              ),
+              GeneratedPost(
+                content: '第三篇測試文章',
+                score: -3.75,
+              ),
+            ];
+            navigationService.goPostResult(testPosts);
+            // _sendPostQuery(postQuery).then((result) {
+            //   setState(() {
+            //     _isGenerating = false;
+            //   });
+            //   if (result.isEmpty) {
+            //     setState(() {
+            //       _errorMessage = '生成文章失敗，請稍後再試';
+            //     });
+            //     ScaffoldMessenger.of(context).showSnackBar(
+            //       const SnackBar(
+            //         content: Text('生成文章失敗，請稍後再試'),
+            //         backgroundColor: Colors.red,
+            //       ),
+            //     );
+            //     return;
+            //   }
+            //   setState(() {
+            //     _errorMessage = '';
+            //   });
+            //   navigationService.goPostResult(result);
+            // });
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: _isGenerating? Colors.grey : Colors.deepPurple,
-            foregroundColor: Colors.white,
+            backgroundColor: _isGenerating ? colorScheme.outline : colorScheme.primary,
+            foregroundColor: colorScheme.onPrimary,
             padding: const EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),

@@ -107,10 +107,8 @@ class App extends StatelessWidget {
             theme = none_theme.MaterialTheme(ThemeData.light().textTheme).light();
             break;
           default:
-            theme = ThemeData(
-              colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-              useMaterial3: true,
-            );
+            theme = none_theme.MaterialTheme(ThemeData.light().textTheme).light();
+            break;
         }
         return MaterialApp.router(
           routerConfig: routerConfig,
