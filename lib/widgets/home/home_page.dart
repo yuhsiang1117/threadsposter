@@ -76,7 +76,7 @@ class _HomeState extends State<Home> {
               alignment: Alignment.center,
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  final double itemWidth = constraints.maxWidth;
+                  final double itemWidth = constraints.maxWidth * 0.6; // 每個item寬度為螢幕寬度的60%
                   return ScrollConfiguration(
                     behavior: const ScrollBehavior().copyWith(
                       dragDevices: {PointerDeviceKind.touch, PointerDeviceKind.mouse, PointerDeviceKind.trackpad},  
@@ -94,11 +94,25 @@ class _HomeState extends State<Home> {
                         // carouselController.animateToItem(index, duration: Duration(milliseconds: 300), curve: Curves.elasticOut);
                       },
                       itemBuilder: (context, itemIndex, realIndex) {
-                        return SizedBox(
-                          width: double.infinity, // 讓每個item寬度等於螢幕寬
-                          child: Dailypop(
-                            screenWidth: screenWidth,
-                            index: itemIndex,
+                        // 計算與當前頁的距離
+                        int diff = (itemIndex - currentPage) % toneOptions.length;
+                        if (diff > toneOptions.length / 2) diff -= toneOptions.length; // 處理循環
+                        double scale = diff == 0 ? 1.0 : 0.8; // 當前頁 1.0，左右頁 0.8
+                        double opacity = diff == 0 ? 1.0 : 0.5; // 當前頁 1.0，左右頁 0.5
+
+                        return Center(
+                          child: Transform.scale(
+                            scale: scale,
+                            child: Opacity(
+                              opacity: opacity,
+                              child: SizedBox(
+                                width: itemWidth, // 讓每個item寬度等於螢幕寬
+                                child: Dailypop(
+                                  screenWidth: screenWidth,
+                                  index: itemIndex,
+                                ),
+                              ),
+                            ),
                           ),
                         );
                       },
