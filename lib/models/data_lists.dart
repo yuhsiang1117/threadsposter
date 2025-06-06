@@ -13,6 +13,15 @@ class ToneProvider with ChangeNotifier {
   List<ToneOption> _toneOptions = [];
   List<ToneOption> get tones => _toneOptions;
 
+  int _currentPage = 0;
+  int get currentPage => _currentPage;
+  set currentPage(int value) {
+    if (_currentPage != value) {
+      _currentPage = value;
+      notifyListeners();
+    }
+  }
+
   Future<void> fetchTones() async {
     _toneOptions = await updateToneOptions();
     notifyListeners();

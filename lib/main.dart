@@ -7,6 +7,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:threadsposter/theme/simp_theme.dart' as simp_theme;
+import 'package:threadsposter/theme/none_theme.dart' as none_theme;
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -79,14 +81,43 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      routerConfig: routerConfig,
-      restorationScopeId: 'app',
-      title: 'Threads Poster',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+    return Consumer<ToneProvider>(
+      builder: (context, toneProvider, child) {
+        final tones = toneProvider.tones.isNotEmpty ? toneProvider.tones : options;
+        final currentPage = toneProvider.currentPage;
+        final currentTone = tones.isNotEmpty && currentPage < tones.length ? tones[currentPage].id : 'none';
+        ThemeData theme;
+        switch (currentTone) {
+          case 'simp':
+            theme = simp_theme.MaterialTheme(ThemeData.light().textTheme).light();
+            break;
+          case 'boss':
+            theme = ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
+              useMaterial3: true,
+            );
+            break;
+          case 'custom':
+            theme = ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
+              useMaterial3: true,
+            );
+            break;
+          case 'none':
+            theme = none_theme.MaterialTheme(ThemeData.light().textTheme).light();
+            break;
+          default:
+            theme = ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+              useMaterial3: true,
+            );
+        }
+        return MaterialApp.router(
+          routerConfig: routerConfig,
+          restorationScopeId: 'app',
+          theme: theme,
+        );
+      },
     );
   }
 }

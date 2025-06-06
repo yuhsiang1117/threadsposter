@@ -7,7 +7,6 @@ import 'package:threadsposter/services/navigation.dart';
 import 'package:threadsposter/models/data_lists.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
 
-int currentPage = 0;
 String customTone = '';
 
 class Home extends StatefulWidget {
@@ -51,13 +50,22 @@ class _HomeState extends State<Home> {
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('選擇角色'),
+        title: Text(
+          '選擇角色',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            color: Theme.of(context).colorScheme.onPrimary,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.2,
+          ),
+        ),
         centerTitle: false,
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        elevation: 2,
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
+            color: Theme.of(context).colorScheme.onPrimary,
             onPressed: () {
               final navigationService = Provider.of<NavigationService>(context, listen: false);
               navigationService.goSetting();
@@ -199,11 +207,14 @@ class _HomeState extends State<Home> {
             flex: 3,
             child: Container(
               width: double.infinity,
-              color: Colors.grey[100],
+              color: Theme.of(context).colorScheme.surface,
               padding: const EdgeInsets.all(16.0),
               child: Text(
-                toneOptions[currentPage].description,
-                style: TextStyle(fontSize: 16),
+                toneOptions[context.watch<ToneProvider>().currentPage].description,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 16,
+                ),
               ),
             ),
           ),

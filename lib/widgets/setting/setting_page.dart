@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:threadsposter/services/navigation.dart';
@@ -6,6 +5,7 @@ import 'package:threadsposter/widgets/setting/history.dart';
 import 'package:threadsposter/widgets/setting/notification.dart';
 import 'package:threadsposter/widgets/setting/google_sign_in.dart';
 import 'package:threadsposter/widgets/setting/api_test_widget.dart';
+import 'package:threadsposter/widgets/setting/savedposts.dart';
 import 'edit_profile.dart';
 class Setting extends StatefulWidget {
   const Setting({super.key});
@@ -107,7 +107,12 @@ class Setting extends StatefulWidget {
             _buildMenuItem(
               icon: Icons.favorite,
               title: '我的收藏',
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SavedPost()),
+                );
+              },
             ),
             _buildDivider(),
             _buildMenuItem(
