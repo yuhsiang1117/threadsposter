@@ -1,674 +1,269 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-class SavedPost extends StatelessWidget {
+class SavedPost extends StatefulWidget {
   const SavedPost({super.key});
 
   @override
+  State<SavedPost> createState() => _SavedPostState();
+}
+
+class _SavedPostState extends State<SavedPost> {
+  List<Map<String, String>> savedArticles = [
+    {
+      'title': '啊啊啊地震',
+      'content': '剛剛地震超大，大家還好嗎？',
+      'style': 'Emotion',
+    },
+    {
+      'title': '測試',
+      'content': '測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試',
+      'style': 'Practical',
+    },
+    {
+      'title': '測試2',
+      'content': '測試2',
+      'style': 'Identity',
+    },
+    {
+      'title': '測試3',
+      'content': '測試3',
+      'style': 'Emotion',
+    },
+    {
+      'title': '測試4',
+      'content': '測試4',
+      'style': 'Trend',
+    },
+    {
+      'title': '測試5',
+      'content': '測試5',
+      'style': 'Practical',
+    },
+    {
+      'title': '測試6',
+      'content': '測試6',
+      'style': 'Identity',
+    },
+    {
+      'title': '測試7',
+      'content': '測試7',
+      'style': 'Emotion',
+    },
+    {
+      'title': '測試8',
+      'content': '測試8',
+      'style': 'Trend',
+    },
+    {
+      'title': '測試9',
+      'content': '測試9',
+      'style': 'Practical',
+    },
+    {
+      'title': '測試10',
+      'content': '測試10',
+      'style': 'Identity',
+    },
+    {
+      'title': '測試11',
+      'content': '測試11',
+      'style': 'Emotion',
+    },
+    {
+      'title': '測試12',
+      'content': '測試12',
+      'style': 'Trend',
+    },
+  ];
+
+  final List<String> styleOptions = const [
+    '全部',
+    'Emotion',
+    'Practical',
+    'Identity',
+    'Trend',
+  ];
+
+  String selectedStyle = '全部';
+
+  @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(
-          width: 402,
-          height: 866,
-          child: Stack(
-            children: [
-              Positioned(
-                left: 0,
-                top: 0,
-                child: Container(
-                  width: 402,
-                  height: 874,
-                  clipBehavior: Clip.antiAlias,
-                  decoration: ShapeDecoration(
-                    color: Colors.white /* Backgrounds-Primary */,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(44),
+    final filteredArticles = selectedStyle == '全部'
+        ? savedArticles
+        : savedArticles.where((a) => a['style'] == selectedStyle).toList();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          '我的收藏',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            color: Theme.of(context).colorScheme.onPrimary,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.2,
+          ),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        elevation: 2,
+      ),
+      backgroundColor: Theme.of(context).colorScheme.background,
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            child: Row(
+              children: [
+                Expanded(child: Container()),
+                Icon(Icons.filter_list, color: Theme.of(context).colorScheme.primary),
+                const SizedBox(width: 8),
+                DropdownButton<String>(
+                  value: selectedStyle,
+                  underline: SizedBox(),
+                  dropdownColor: Colors.grey[900],
+                  items: styleOptions
+                      .map((style) => DropdownMenuItem(
+                            value: style,
+                            child: Text(style, style: const TextStyle(color: Colors.white)),
+                          ))
+                      .toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        selectedStyle = value;
+                      });
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: filteredArticles.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.bookmark_border, size: 80, color: Theme.of(context).colorScheme.primary.withOpacity(0.2)),
+                        const SizedBox(height: 16),
+                        Text('尚無收藏貼文', style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Theme.of(context).colorScheme.onBackground.withOpacity(0.6))),
+                      ],
                     ),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: 402,
-                        child: Stack(
-                          children: [
-                            Positioned(
-                              left: 0,
-                              top: 0,
-                              child: Container(
-                                width: 402,
-                                height: 54,
-                                clipBehavior: Clip.antiAlias,
-                                decoration: ShapeDecoration(
-                                  shape: RoundedRectangleBorder(
-                                    side: BorderSide(
-                                      width: 0.33,
-                                      color: Colors.black.withValues(alpha: 77) /* Miscellaneous-Bar-border */,
-                                    ),
-                                  ),
-                                ),
-                                child: Stack(
+                  )
+                : ListView.separated(
+                    padding: const EdgeInsets.all(20),
+                    itemCount: filteredArticles.length,
+                    separatorBuilder: (context, index) => const SizedBox(height: 20),
+                    itemBuilder: (context, index) {
+                      final article = filteredArticles[index];
+                      final realIndex = savedArticles.indexOf(article);
+                      return Card(
+                        elevation: 4,
+                        color: Theme.of(context).colorScheme.surface,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        child: InkWell(
+                          onLongPress: () {
+                            final content = article['content'] ?? '';
+                            Clipboard.setData(ClipboardData(text: content));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('已複製到剪貼簿')),
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(20),
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Positioned(
-                                      left: 0,
-                                      top: 0,
-                                      child: Container(
-                                        width: 402,
-                                        height: 54,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white.withValues(alpha: 191),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              width: 402,
-                              height: 54,
-                              padding: const EdgeInsets.only(top: 21),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      spacing: 134,
-                                      children: [
-                                        Expanded(
-                                          child: Container(
-                                            padding: const EdgeInsets.only(left: 16, right: 6),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              crossAxisAlignment: CrossAxisAlignment.center,
-                                              spacing: 10,
-                                              children: [
-                                                Text(
-                                                  '9:41',
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                    color: Colors.black /* Labels-Primary */,
-                                                    fontSize: 17,
-                                                    fontFamily: 'SF Pro',
-                                                    fontWeight: FontWeight.w600,
-                                                    height: 1.29,
-                                                  ),
-                                                ),
-                                              ],
+                                    Expanded(
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              article['title'] ?? '',
+                                              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
                                             ),
                                           ),
-                                        ),
-                                        SizedBox(width: 124, height: 10),
-                                        Expanded(
-                                          child: Container(
-                                            padding: const EdgeInsets.only(left: 6, right: 16),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              crossAxisAlignment: CrossAxisAlignment.center,
-                                              spacing: 7,
-                                              children: [
-                                                Opacity(
-                                                  opacity: 0.35,
-                                                  child: Container(
-                                                    width: 25,
-                                                    height: 13,
-                                                    decoration: ShapeDecoration(
-                                                      shape: RoundedRectangleBorder(
-                                                        side: BorderSide(
-                                                          width: 1,
-                                                          color: Colors.black /* Labels-Primary */,
-                                                        ),
-                                                        borderRadius: BorderRadius.circular(4.30),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                Container(
-                                                  width: 21,
-                                                  height: 9,
-                                                  decoration: ShapeDecoration(
-                                                    color: Colors.black /* Labels-Primary */,
-                                                    shape: RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.circular(2.50),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
+                                          if (article['style'] != null)
+                                            Padding(
+                                              padding: const EdgeInsets.only(left: 8),
+                                              child: Chip(
+                                                label: Text(article['style']!, style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onPrimary)),
+                                                backgroundColor: _chipColor(article['style']),
+                                                labelStyle: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onPrimary),
+                                                padding: const EdgeInsets.symmetric(horizontal: 8),
+                                              ),
                                             ),
+                                        ],
+                                      ),
+                                    ),
+                                    PopupMenuButton<String>(
+                                      color: Theme.of(context).colorScheme.surface,
+                                      onSelected: (value) {
+                                        if (value == 'delete') {
+                                          setState(() {
+                                            savedArticles.removeAt(realIndex);
+                                          });
+                                        }
+                                      },
+                                      itemBuilder: (context) => [
+                                        PopupMenuItem(
+                                          value: 'delete',
+                                          child: Row(
+                                            children: [
+                                              Icon(Icons.delete, color: Colors.red, size: 20),
+                                              const SizedBox(width: 8),
+                                              Text('刪除', style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.red)),
+                                            ],
                                           ),
                                         ),
                                       ],
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        width: 402,
-                        height: 817,
-                        child: Stack(
-                          children: [
-                            Positioned(
-                              left: 0,
-                              top: 0,
-                              child: Container(
-                                width: 402,
-                                height: 733,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFFEF7FF) /* Schemes-Surface-Bright */,
-                                ),
-                                child: Stack(
-                                  children: [
-                                    Positioned(
-                                      left: 3,
-                                      top: 86,
-                                      child: Container(
-                                        width: 402,
-                                        height: 649,
-                                        clipBehavior: Clip.antiAlias,
-                                        decoration: BoxDecoration(),
-                                        child: Stack(
-                                          children: [
-                                            Positioned(
-                                              left: -3,
-                                              top: 0,
-                                              child: Container(
-                                                width: 402,
-                                                height: 716,
-                                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                                                decoration: BoxDecoration(
-                                                  color: const Color(0xFFFEF7FF) /* Schemes-Surface */,
-                                                ),
-                                                child: Column(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  mainAxisAlignment: MainAxisAlignment.start,
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  spacing: 20,
-                                                  children: [
-                                                    ConstrainedBox(
-                                                      constraints: BoxConstraints(minHeight: 56),
-                                                      child: SizedBox(
-                                                        width: double.infinity,
-                                                        child: Column(
-                                                          mainAxisSize: MainAxisSize.min,
-                                                          mainAxisAlignment: MainAxisAlignment.center,
-                                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                                          children: [
-                                                            Opacity(
-                                                              opacity: 0.24,
-                                                              child: Container(
-                                                                width: 344,
-                                                                height: 186,
-                                                                decoration: ShapeDecoration(
-                                                                  color: Colors.white,
-                                                                  shape: RoundedRectangleBorder(
-                                                                    side: BorderSide(width: 1),
-                                                                    borderRadius: BorderRadius.circular(22),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            SizedBox(
-                                                              width: 293,
-                                                              height: 141,
-                                                              child: Text(
-                                                                '啊啊啊地震',
-                                                                style: TextStyle(
-                                                                  color: Colors.black,
-                                                                  fontSize: 20,
-                                                                  fontFamily: 'Inter',
-                                                                  fontWeight: FontWeight.w500,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    ConstrainedBox(
-                                                      constraints: BoxConstraints(minHeight: 56),
-                                                      child: SizedBox(
-                                                        width: double.infinity,
-                                                        child: Column(
-                                                          mainAxisSize: MainAxisSize.min,
-                                                          mainAxisAlignment: MainAxisAlignment.center,
-                                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                                          children: [
-                                                            Opacity(
-                                                              opacity: 0.24,
-                                                              child: Container(
-                                                                width: 344,
-                                                                height: 186,
-                                                                decoration: ShapeDecoration(
-                                                                  color: Colors.white,
-                                                                  shape: RoundedRectangleBorder(
-                                                                    side: BorderSide(width: 1),
-                                                                    borderRadius: BorderRadius.circular(22),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            SizedBox(
-                                                              width: 293,
-                                                              height: 141,
-                                                              child: Text(
-                                                                '喂，川普\n我現在在頂樓，這裡風好大\n                                                                兄弟們下輩子一定還要一起炒股',
-                                                                style: TextStyle(
-                                                                  color: Colors.black,
-                                                                  fontSize: 20,
-                                                                  fontFamily: 'Inter',
-                                                                  fontWeight: FontWeight.w500,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Text(
-                                                              '立即發文',
-                                                              textAlign: TextAlign.center,
-                                                              style: TextStyle(
-                                                                color: Colors.white,
-                                                                fontSize: 15,
-                                                                fontFamily: 'Inter',
-                                                                fontWeight: FontWeight.w900,
-                                                                height: 1.33,
-                                                                letterSpacing: -0.23,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    ConstrainedBox(
-                                                      constraints: BoxConstraints(minHeight: 56),
-                                                      child: SizedBox(
-                                                        width: double.infinity,
-                                                        child: Column(
-                                                          mainAxisSize: MainAxisSize.min,
-                                                          mainAxisAlignment: MainAxisAlignment.center,
-                                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                                          children: [
-                                                            Opacity(
-                                                              opacity: 0.24,
-                                                              child: Container(
-                                                                width: 344,
-                                                                height: 186,
-                                                                decoration: ShapeDecoration(
-                                                                  color: Colors.white,
-                                                                  shape: RoundedRectangleBorder(
-                                                                    side: BorderSide(width: 1),
-                                                                    borderRadius: BorderRadius.circular(22),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            SizedBox(
-                                                              width: 293,
-                                                              height: 141,
-                                                              child: Text(
-                                                                '測試',
-                                                                style: TextStyle(
-                                                                  color: Colors.black,
-                                                                  fontSize: 20,
-                                                                  fontFamily: 'Inter',
-                                                                  fontWeight: FontWeight.w500,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Text(
-                                                              '立即發文',
-                                                              textAlign: TextAlign.center,
-                                                              style: TextStyle(
-                                                                color: Colors.white,
-                                                                fontSize: 15,
-                                                                fontFamily: 'Inter',
-                                                                fontWeight: FontWeight.w900,
-                                                                height: 1.33,
-                                                                letterSpacing: -0.23,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    ConstrainedBox(
-                                                      constraints: BoxConstraints(minHeight: 56),
-                                                      child: SizedBox(
-                                                        width: double.infinity,
-                                                        child: Column(
-                                                          mainAxisSize: MainAxisSize.min,
-                                                          mainAxisAlignment: MainAxisAlignment.center,
-                                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                                          children: [
-                                                            Opacity(
-                                                              opacity: 0.24,
-                                                              child: Container(
-                                                                width: 344,
-                                                                height: 186,
-                                                                decoration: ShapeDecoration(
-                                                                  color: Colors.white,
-                                                                  shape: RoundedRectangleBorder(
-                                                                    side: BorderSide(width: 1),
-                                                                    borderRadius: BorderRadius.circular(22),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            SizedBox(
-                                                              width: 293,
-                                                              height: 141,
-                                                              child: Text(
-                                                                '測試',
-                                                                style: TextStyle(
-                                                                  color: Colors.black,
-                                                                  fontSize: 20,
-                                                                  fontFamily: 'Inter',
-                                                                  fontWeight: FontWeight.w500,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Text(
-                                                              '立即發文',
-                                                              textAlign: TextAlign.center,
-                                                              style: TextStyle(
-                                                                color: Colors.white,
-                                                                fontSize: 15,
-                                                                fontFamily: 'Inter',
-                                                                fontWeight: FontWeight.w900,
-                                                                height: 1.33,
-                                                                letterSpacing: -0.23,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      left: 0,
-                                      top: 735,
-                                      child: SizedBox(
-                                        width: 402,
-                                        height: 84,
-                                        child: Stack(
-                                          children: [
-                                            Positioned(
-                                              left: 0,
-                                              top: 0,
-                                              child: Container(
-                                                width: 402,
-                                                height: 84,
-                                                clipBehavior: Clip.antiAlias,
-                                                decoration: ShapeDecoration(
-                                                  shape: RoundedRectangleBorder(
-                                                    side: BorderSide(
-                                                      width: 0.33,
-                                                      strokeAlign: BorderSide.strokeAlignOutside,
-                                                      color: Colors.black.withValues(alpha: 77) /* Miscellaneous-Bar-border */,
-                                                    ),
-                                                  ),
-                                                ),
-                                                child: Stack(
-                                                  children: [
-                                                    Positioned(
-                                                      left: 0,
-                                                      top: 0,
-                                                      child: Container(
-                                                        width: 402,
-                                                        height: 84,
-                                                        decoration: BoxDecoration(
-                                                          color: Colors.white.withValues(alpha: 191),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                            Positioned(
-                                              left: 0,
-                                              top: 0,
-                                              child: SizedBox(
-                                                width: 402,
-                                                height: 84,
-                                                child: Stack(
-                                                  children: [
-                                                    Positioned(
-                                                      left: 22,
-                                                      top: 20,
-                                                      child: SizedBox(
-                                                        width: 80.40,
-                                                        height: 40,
-                                                        child: Stack(
-                                                          children: [
-                                                            Positioned(
-                                                              left: 0,
-                                                              top: 32,
-                                                              child: SizedBox(
-                                                                width: 80,
-                                                                height: 8,
-                                                                child: Text(
-                                                                  'Home',
-                                                                  textAlign: TextAlign.center,
-                                                                  style: TextStyle(
-                                                                    color: const Color(0xFF999999),
-                                                                    fontSize: 10,
-                                                                    fontFamily: 'Inter',
-                                                                    fontWeight: FontWeight.w400,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Positioned(
-                                                              left: 25,
-                                                              top: 0,
-                                                              child: Container(
-                                                                width: 30,
-                                                                height: 30,
-                                                                clipBehavior: Clip.antiAlias,
-                                                                decoration: BoxDecoration(),
-                                                                child: Stack(),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Positioned(
-                                                      left: 304,
-                                                      top: 20,
-                                                      child: SizedBox(
-                                                        width: 80.40,
-                                                        height: 40,
-                                                        child: Stack(
-                                                          children: [
-                                                            Positioned(
-                                                              left: 25.20,
-                                                              top: -2,
-                                                              child: Container(
-                                                                width: 30,
-                                                                height: 30,
-                                                                clipBehavior: Clip.antiAlias,
-                                                                decoration: BoxDecoration(),
-                                                                child: Stack(),
-                                                              ),
-                                                            ),
-                                                            Positioned(
-                                                              left: 0.20,
-                                                              top: 30,
-                                                              child: SizedBox(
-                                                                width: 80,
-                                                                height: 8,
-                                                                child: Text(
-                                                                  'Setting',
-                                                                  textAlign: TextAlign.center,
-                                                                  style: TextStyle(
-                                                                    color: const Color(0xFF007AFF),
-                                                                    fontSize: 10,
-                                                                    fontFamily: 'Inter',
-                                                                    fontWeight: FontWeight.w400,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Positioned(
-                                                      left: 163,
-                                                      top: 20,
-                                                      child: SizedBox(
-                                                        width: 80.40,
-                                                        height: 40,
-                                                        child: Stack(
-                                                          children: [
-                                                            Positioned(
-                                                              left: 0,
-                                                              top: 30,
-                                                              child: SizedBox(
-                                                                width: 80,
-                                                                height: 8,
-                                                                child: Text(
-                                                                  'Post',
-                                                                  textAlign: TextAlign.center,
-                                                                  style: TextStyle(
-                                                                    color: const Color(0xFF999999),
-                                                                    fontSize: 10,
-                                                                    fontFamily: 'Inter',
-                                                                    fontWeight: FontWeight.w400,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Positioned(
-                                                              left: 25,
-                                                              top: 0,
-                                                              child: Container(
-                                                                width: 30,
-                                                                height: 30,
-                                                                clipBehavior: Clip.antiAlias,
-                                                                decoration: BoxDecoration(),
-                                                                child: Stack(),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      left: 62,
-                                      top: 25,
-                                      child: Text(
-                                        '已儲存的貼文',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 24,
-                                          fontFamily: 'Inter',
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      left: 18,
-                                      top: 25,
-                                      child: SizedBox(width: 30, height: 30, child: Stack()),
-                                    ),
                                   ],
                                 ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 0,
-                top: 832,
-                child: SizedBox(
-                  width: 402,
-                  height: 34,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 273,
-                        top: 26,
-                        child: Container(
-                          transform: Matrix4.identity()..translate(0.0, 0.0)..rotateZ(3.14),
-                          width: 144,
-                          height: 5,
-                          decoration: ShapeDecoration(
-                            color: Colors.black /* Labels-Primary */,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(100),
+                                const SizedBox(height: 12),
+                                Container(
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).colorScheme.background,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  padding: const EdgeInsets.all(14),
+                                  child: Text(
+                                    article['content'] ?? '',
+                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onBackground),
+                                    softWrap: true,
+                                    overflow: TextOverflow.visible,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      );
+                    },
                   ),
-                ),
-              ),
-              Positioned(
-                left: 0,
-                top: 0,
-                child: SizedBox(
-                  width: 402,
-                  height: 874,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: -24,
-                        top: -23,
-                        child: Container(
-                          width: 450,
-                          height: 920,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: NetworkImage("https://placehold.co/450x920"),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
           ),
-        ),
-      ],
+        ],
+      ),
     );
+  }
+
+  Color _chipColor(String? style) {
+    switch (style) {
+      case 'Emotion':
+        return Colors.deepPurple.shade700;
+      case 'Practical':
+        return Colors.teal.shade700;
+      case 'Identity':
+        return Colors.orange.shade700;
+      case 'Trend':
+        return Colors.pink.shade700;
+      default:
+        return Colors.grey.shade700;
+    }
   }
 }

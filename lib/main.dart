@@ -3,12 +3,12 @@ import 'package:provider/provider.dart';
 import 'package:threadsposter/models/data_lists.dart';
 import 'package:threadsposter/services/navigation.dart';
 import 'package:threadsposter/services/UserData_provider.dart';
-import 'package:threadsposter/widgets/login.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
+import 'package:threadsposter/theme/simp_theme.dart' as simp_theme;
+import 'package:threadsposter/theme/none_theme.dart' as none_theme;
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -37,42 +37,7 @@ Future<void> requestPermissions() async {
     await Permission.notification.request();
   }
 
-class AuthGate extends StatelessWidget {
-  const AuthGate({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
-        } else if (snapshot.hasData) {
-          // ✅ 這裡登入後再初始化 Provider
-          return MultiProvider(
-            providers: [
-              Provider<NavigationService>(create: (_) => NavigationService()),
-              ChangeNotifierProvider<ToneProvider>(create: (_) => ToneProvider()),
-              ChangeNotifierProvider<UserDataProvider>(create: (_) => UserDataProvider()),
-            ],
-            child: MaterialApp.router(
-              routerConfig: routerConfig,
-              restorationScopeId: 'app',
-              title: 'Threads Poster',
-              theme: ThemeData(
-                colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-                useMaterial3: true,
-              ),
-            )
-          );
-        } else {
-          // 👤 未登入，直接去登入頁面
-          return LoginPage();
-        }
-      },
-    );
-  }
-}
 
 
 
@@ -111,13 +76,51 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-     return MaterialApp(
-      title: 'Threads Poster',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const AuthGate(), // 讓 AuthGate 成為首頁，裡面再決定顯示什麼頁面
-    );
+    return MultiProvider(
+        providers: [
+          Provider<NavigationService>(create: (_) => NavigationService()),
+          ChangeNotifierProvider<ToneProvider>(create: (_) => ToneProvider()),
+          ChangeNotifierProvider<UserDataProvider>(create: (_) => UserDataProvider()),
+        ],
+        child: Consumer<ToneProvider>(
+        builder: (context, toneProvider, child) {
+          final tones = toneProvider.tones.isNotEmpty ? toneProvider.tones : options;
+          final currentPage = toneProvider.currentPage;
+          final currentTone = tones.isNotEmpty && currentPage < tones.length ? tones[currentPage].id : 'none';
+          ThemeData theme;
+          switch (currentTone) {
+            case 'simp':
+              theme = simp_theme.MaterialTheme(ThemeData.light().textTheme).light();
+              break;
+            case 'boss':
+              theme = ThemeData(
+                colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
+                useMaterial3: true,
+              );
+              break;
+            case 'custom':
+              theme = ThemeData(
+                colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
+                useMaterial3: true,
+              );
+              break;
+            case 'none':
+              theme = none_theme.MaterialTheme(ThemeData.light().textTheme).light();
+              break;
+            default:
+              theme = none_theme.MaterialTheme(ThemeData.light().textTheme).light();
+              break;
+          }
+          return MaterialApp.router(
+            routerConfig: routerConfig,
+            restorationScopeId: 'app',
+            title: 'Threads Poster',
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+              useMaterial3: true,
+            ),
+          );
+        })
+      );
   }
 }

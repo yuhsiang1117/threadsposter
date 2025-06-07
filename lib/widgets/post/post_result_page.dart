@@ -27,18 +27,21 @@ class _PostResultState extends State<PostResult> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
-            currentResult.clear(); // 清除結果以便下次使用
+            currentResult.clear();
           },
         ),
-        title: const Text('生成結果'),
-        backgroundColor: Colors.deepPurple,
-      foregroundColor: Colors.white,
+        title: Text('生成結果', style: theme.textTheme.titleLarge?.copyWith(color: colorScheme.onPrimary)),
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
+        elevation: 2,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -53,27 +56,14 @@ class _PostResultState extends State<PostResult> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     _buildSectionHeader('生成文章 ${i + 1}'),
-                    ElevatedButton(
+                    _buildActionButton(
+                      label: '複製',
                       onPressed: () {
-                      if (currentResult.length > i) {
-                        Clipboard.setData(
-                          ClipboardData(text: currentResult[i].content),
-                        );
+                        Clipboard.setData(ClipboardData(text: _generatedTextController.text));
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('文字已複製到剪貼板')),
                         );
-                      }
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF65558F),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        minimumSize: const Size(60, 36),
-                      ),
-                      child: const Text('複製'),
                     ),
                   ],
                 ),
@@ -152,9 +142,10 @@ class _PostResultState extends State<PostResult> {
   }
 
   Widget _buildTextArea(TextEditingController controller, {String? hintText, bool readOnly = false}) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
+        border: Border.all(color: colorScheme.outline),
         borderRadius: BorderRadius.circular(8),
       ),
       child: TextField(
@@ -166,11 +157,13 @@ class _PostResultState extends State<PostResult> {
           border: InputBorder.none,
         ),
         readOnly: readOnly,
+        style: TextStyle(color: colorScheme.onSurface),
       ),
     );
   }
 
   Widget _buildActionButtons() {
+    final colorScheme = Theme.of(context).colorScheme;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -181,15 +174,7 @@ class _PostResultState extends State<PostResult> {
           },
         ),
         const SizedBox(width: 12),
-        _buildActionButton(
-          label: '複製',
-          onPressed: () {
-            Clipboard.setData(ClipboardData(text: _generatedTextController.text));
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('文字已複製到剪貼板')),
-            );
-          },
-        ),
+        
         const SizedBox(width: 12),
         _buildActionButton(
           label: '發文',
@@ -206,11 +191,12 @@ class _PostResultState extends State<PostResult> {
     required String label,
     required VoidCallback onPressed,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF65558F),
-        foregroundColor: Colors.white,
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
@@ -222,6 +208,7 @@ class _PostResultState extends State<PostResult> {
   }
 
   Widget _buildBottomButtons() {
+    final colorScheme = Theme.of(context).colorScheme;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -231,20 +218,21 @@ class _PostResultState extends State<PostResult> {
           },
           style: OutlinedButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            foregroundColor: colorScheme.primary,
+            side: BorderSide(color: colorScheme.primary),
           ),
           child: const Text('取消'),
         ),
         ElevatedButton(
           onPressed: () {
-            // 使用自定義文字處理邏輯
             setState(() {
               _generatedTextController.text = _customTextController.text;
               _customTextController.clear();
             });
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF65558F),
-            foregroundColor: Colors.white,
+            backgroundColor: colorScheme.primary,
+            foregroundColor: colorScheme.onPrimary,
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           ),
           child: const Text('使用此文字'),

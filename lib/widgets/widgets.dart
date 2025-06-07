@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 // Home
-export 'package:threadsposter/widgets/home/dailypop.dart';
+export 'package:threadsposter/widgets/home/character_card.dart';
 export 'package:threadsposter/widgets/home/home_page.dart';
 // Post
 export 'package:threadsposter/widgets/post/post_page.dart';

@@ -54,7 +54,7 @@ class _FirstLoginPageState extends State<FirstLoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('輸入個人資料'),
+        title: const Text('輸入使用者資料'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
