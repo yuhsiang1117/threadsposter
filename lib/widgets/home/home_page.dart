@@ -4,11 +4,29 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:threadsposter/widgets/widgets.dart';
 import 'package:threadsposter/services/navigation.dart';
+import 'package:threadsposter/services/UserData_provider.dart';
+import 'package:threadsposter/widgets/setting/first_login.dart';
 import 'package:threadsposter/models/data_lists.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 String customTone = '';
 int currentPage = 0;
+
+Future<bool> checkUserDocumentExists(String? uid) async {
+  try {
+    final docRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('profile')
+        .doc('info');
+    final docSnapshot = await docRef.get();
+    return docSnapshot.exists;
+  } catch (e) {
+    print('Error checking document: $e');
+    return false;
+  }
+}
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -20,6 +38,8 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> with TickerProviderStateMixin {
   final TextEditingController _customToneController = TextEditingController();
   late final InfiniteScrollController carouselController;
+  late Future<bool> _future;
+  late String? uid;
   late AnimationController _textController;
   late Animation<int> _textAnimation;
   String _lastDescription = '';
@@ -29,6 +49,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     debugPrint('[lib/widgets/home/home_page.dart] Home Page Initializing...');
     super.initState();
     carouselController = InfiniteScrollController(initialItem: currentPage);
+    uid = context.read<UserDataProvider>().uid;
+    _future = checkUserDocumentExists(uid);
+    // 做你想做的事，例如發出請求或設定變數
     _textController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 1000),
@@ -55,8 +78,46 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     _textController.forward();
   }
 
+  void _refresh() {
+    setState(() {
+      _future = checkUserDocumentExists(uid);
+    });
+  }
   @override
   Widget build(BuildContext context) {
+    uid = context.watch<UserDataProvider>().uid;
+
+    if (uid == null) {
+      return const Scaffold(body: Center(child: Text('尚未登入')));
+    }
+
+    return FutureBuilder<bool>(
+      future: _future,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+        }
+
+        if (snapshot.hasError) {
+          return const Scaffold(body: Center(child: Text('發生錯誤')));
+        }
+
+        final bool isExistingUser = snapshot.data ?? false;
+        print("is exist user:${snapshot.data}");
+        print(uid);
+        if (isExistingUser == false) {
+          // 可以導去首次登入設定頁面，也可以顯示引導訊息
+          return FirstLoginPage(onRefresh: _refresh);
+        }
+
+        // ✅ 如果使用者不是第一次登入，就顯示原本的 Home UI
+        return buildMainHomeContent(context);
+      },
+    );
+  }
+
+  Widget buildMainHomeContent(BuildContext context){
+
     final double screenWidth = MediaQuery.of(context).size.width;
     final toneOptions = Provider.of<ToneProvider>(context).tones;
     _customToneController.text = customTone;

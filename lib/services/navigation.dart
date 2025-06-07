@@ -2,11 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:threadsposter/widgets/widgets.dart';
 import 'package:threadsposter/services/api.dart';
-
+import 'package:threadsposter/widgets/login.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 final routerConfig = GoRouter(
   initialLocation: '/home',
   debugLogDiagnostics: true,
   routes: <RouteBase>[
+    GoRoute(
+      path: '/login',
+      pageBuilder: (context, state) => NoTransitionPage<void>(
+        child: LoginPage()
+      ),
+    ),
     GoRoute(
       path: '/home',
       pageBuilder: (context, state) => const NoTransitionPage<void>(
@@ -39,6 +46,13 @@ final routerConfig = GoRouter(
     if (currentPath == '/') {
       return '/home';
     }
+    //login
+    final User? currentUser = FirebaseAuth.instance.currentUser;
+    final bool goingToLoginPage = (state.uri.path == '/login_check' || state.uri.path == '/login');
+    if (currentUser == null && !goingToLoginPage) {
+ // User is not logged in and trying to access a route
+      return '/login';
+    }
     return null;
   },
   errorBuilder: (context, state) => Scaffold(
@@ -57,6 +71,9 @@ class NavigationService {
 
   void goHome() {
     routerConfig.go('/home');
+  }
+  void goLogin() {
+    routerConfig.go('/login_check');
   }
 
   void goPost({required String tone}) {

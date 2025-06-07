@@ -1,47 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:threadsposter/services/navigation.dart';
+import 'package:threadsposter/services/UserData_provider.dart';
 import 'package:threadsposter/widgets/setting/history.dart';
 import 'package:threadsposter/widgets/setting/notification.dart';
-import 'package:threadsposter/widgets/setting/google_sign_in.dart';
 import 'package:threadsposter/widgets/setting/api_test_widget.dart';
 import 'package:threadsposter/widgets/setting/savedposts.dart';
 import 'edit_profile.dart';
+
 class Setting extends StatefulWidget {
   const Setting({super.key});
 
   @override
   State<Setting> createState() => _SettingState();
-}
+} 
   class _SettingState extends State<Setting> {
-    String _name = '使用者名稱';
-    String _email = 'user@example.com';
+    
+    String? _name;
+    String? _email;
 
     void _navigateToEditProfile() async {
-      final result = await Navigator.push<Map<String, String>>(
-        context,
-        MaterialPageRoute(builder: (context) => const EditProfilePage()),
-      );
-
-      if (result != null && mounted) {
-        setState(() {
-          _name = result['name'] ?? _name;
-          _email = result['email'] ?? _email;
-        });
-      }
+      await Navigator.push(context,MaterialPageRoute(builder: (context) => const EditProfilePage()));
+      setState(() {});
     }
   
 
     @override
     Widget build(BuildContext context) {
-      return Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView(
-          children: [
-            _buildProfileSection(),
-            const SizedBox(height: 24),
-            _buildMenuSection(context),
-          ],
+      _name = context.watch<UserDataProvider>().userinfo?['name'];
+      _email = context.watch<UserDataProvider>().userinfo?['email'];
+      return Scaffold(
+        appBar: AppBar(
+            title: Text(
+              '設定',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                color: Theme.of(context).colorScheme.onPrimary,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.2,
+              ),
+            ),
+            centerTitle: false,
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            elevation: 2,
+          ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ListView(
+        children: [
+          _buildProfileSection(),
+          const SizedBox(height: 24),
+          _buildMenuSection(context),
+        ],
+          ),
         ),
       );
     }
@@ -61,7 +73,7 @@ class Setting extends StatefulWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    _name,
+                    _name!,
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -69,7 +81,7 @@ class Setting extends StatefulWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    _email,
+                    _email!,
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey,
@@ -163,13 +175,31 @@ class Setting extends StatefulWidget {
             _buildMenuItem(
               icon: Icons.logout,
               title: '登出',
-              onTap: () async {
-                try {
-                  final userCredential = await signInWithGoogle();
-                } catch (e, stack) {
-                  print('登入失敗: $e');
-                  print('stack trace: $stack');
-                }
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text('確認登出'),
+                    content: Text('確定要登出嗎？'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(), // 取消，關閉視窗
+                        child: Text('取消'),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          await FirebaseAuth.instance.signOut();
+                          Navigator.of(context).pop(); // 關閉視窗
+                          final navigationService = Provider.of<NavigationService>(context, listen: false);
+                          navigationService.goHome();
+                          // 可選：登出後跳轉頁面
+                          // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => LoginPage()));
+                        },
+                        child: Text('確定'),
+                      ),
+                    ],
+                ),
+    );
               },
               textColor: Colors.red,
             ),

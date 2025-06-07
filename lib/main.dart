@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:threadsposter/models/data_lists.dart';
 import 'package:threadsposter/services/navigation.dart';
-import 'package:threadsposter/services/post_query_provider.dart';
+import 'package:threadsposter/services/UserData_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -33,13 +33,16 @@ Future<void> initializeNotifications() async {
 }
 
 Future<void> requestPermissions() async {
-  if (await Permission.notification.isDenied) {
+  
     await Permission.notification.request();
   }
-}
-void main() async {
-  // 確保 WidgetsFlutterBinding 已初始化
-  // 這是 Flutter 的一個必要步驟，特別是在使用通知或其他需要平台通道的功能時
+
+
+
+
+
+
+void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   debugPrint('[main] 初始化開始');
   try {
@@ -64,15 +67,7 @@ void main() async {
   }
   debugPrint('[main] Firebase 初始化完成');
   runApp(
-    MultiProvider(
-      providers: [
-        Provider<NavigationService>(create: (context) => NavigationService()),
-        ChangeNotifierProvider<ToneProvider>(create: (_) => ToneProvider()),
-        ChangeNotifierProvider<PostQueryProvider>(create: (_) => PostQueryProvider()),
-      ],
-      child: const App(),
-    ),
-    
+    App()
   );
 }
 
@@ -81,41 +76,49 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ToneProvider>(
-      builder: (context, toneProvider, child) {
-        final tones = toneProvider.tones.isNotEmpty ? toneProvider.tones : defaultToneOptions;
-        final currentPage = toneProvider.currentPage;
-        final currentTone = tones.isNotEmpty && currentPage < tones.length ? tones[currentPage].id : 'none';
-        ThemeData theme;
-        switch (currentTone) {
-          case 'simp':
-            theme = simp_theme.MaterialTheme(ThemeData.light().textTheme).light();
-            break;
-          case 'boss':
-            theme = ThemeData(
-              colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
-              useMaterial3: true,
-            );
-            break;
-          case 'custom':
-            theme = ThemeData(
-              colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
-              useMaterial3: true,
-            );
-            break;
-          case 'none':
-            theme = none_theme.MaterialTheme(ThemeData.light().textTheme).light();
-            break;
-          default:
-            theme = none_theme.MaterialTheme(ThemeData.light().textTheme).light();
-            break;
-        }
-        return MaterialApp.router(
-          routerConfig: routerConfig,
-          restorationScopeId: 'app',
-          theme: theme,
-        );
-      },
-    );
+    return MultiProvider(
+        providers: [
+          Provider<NavigationService>(create: (_) => NavigationService()),
+          ChangeNotifierProvider<ToneProvider>(create: (_) => ToneProvider()),
+          ChangeNotifierProvider<UserDataProvider>(create: (_) => UserDataProvider()),
+        ],
+        child: Consumer<ToneProvider>(
+        builder: (context, toneProvider, child) {
+          final tones = toneProvider.tones.isNotEmpty ? toneProvider.tones : defaultToneOptions;
+          final currentPage = toneProvider.currentPage;
+          final currentTone = tones.isNotEmpty && currentPage < tones.length ? tones[currentPage].id : 'none';
+          ThemeData theme;
+          switch (currentTone) {
+            case 'simp':
+              theme = simp_theme.MaterialTheme(ThemeData.light().textTheme).light();
+              break;
+            case 'boss':
+              theme = ThemeData(
+                colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
+                useMaterial3: true,
+              );
+              break;
+            case 'custom':
+              theme = ThemeData(
+                colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
+                useMaterial3: true,
+              );
+              break;
+            case 'none':
+              theme = none_theme.MaterialTheme(ThemeData.light().textTheme).light();
+              break;
+            default:
+              theme = none_theme.MaterialTheme(ThemeData.light().textTheme).light();
+              break;
+          }
+          return MaterialApp.router(
+            routerConfig: routerConfig,
+            restorationScopeId: 'app',
+            title: 'Threads Poster',
+            theme: theme,
+          );
+        })
+      );
+
   }
 }
