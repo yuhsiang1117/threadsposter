@@ -135,6 +135,7 @@ Future<bool> changeTone({required String tone, http.Client? client}) async {
   return json['success'];
 }
 
+// 文章風格
 Future<List<String>> getTone({http.Client? client}) async {
   final httpClient = client ?? http.Client();
   final url = Uri.parse('${getApiBaseUrl()}/styles'); // FastAPI API
@@ -174,7 +175,8 @@ Future<bool> post({required String text, http.Client? client}) async {
   return json['success'];
 }
 
-Future<List<String>> getAvailableTones({http.Client? client}) async {
+// 取得可用角色
+Future<List<Map<String, dynamic>>> getAvailableTones({http.Client? client}) async {
   final httpClient = client ?? http.Client();
   final url = Uri.parse('${getApiBaseUrl()}/valid_tone'); // FastAPI API
   final response = await httpClient.get(
@@ -189,8 +191,8 @@ Future<List<String>> getAvailableTones({http.Client? client}) async {
     httpClient.close();
   }
   if (json['success'] == true) {
-    List<dynamic> tones = json['tones'];
-    return tones.map((tone) => tone.toString()).toList();
+    final tones = List<Map<String, dynamic>>.from(json['tones']);
+    return tones;
   } else {
     throw Exception('API 錯誤：${json["error"]}');
   }

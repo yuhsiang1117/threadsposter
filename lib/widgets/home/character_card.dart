@@ -19,7 +19,9 @@ class Dailypop extends StatelessWidget {
     final toneOptions = Provider.of<ToneProvider>(context, listen: false).tones;
     
     return GestureDetector(
-      onTap: () {
+      onTap: index != currentPage 
+      ? null
+      : () {
         final navigationService = Provider.of<NavigationService>(context, listen: false);
         if(index == toneOptions.length - 1) {
           toneOptions[index].name = '@$customTone';

@@ -83,7 +83,7 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ToneProvider>(
       builder: (context, toneProvider, child) {
-        final tones = toneProvider.tones.isNotEmpty ? toneProvider.tones : options;
+        final tones = toneProvider.tones.isNotEmpty ? toneProvider.tones : defaultToneOptions;
         final currentPage = toneProvider.currentPage;
         final currentTone = tones.isNotEmpty && currentPage < tones.length ? tones[currentPage].id : 'none';
         ThemeData theme;
