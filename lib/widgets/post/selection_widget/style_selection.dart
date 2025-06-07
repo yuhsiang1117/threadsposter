@@ -52,7 +52,11 @@ class _StyleSelectionState extends State<StyleSelection> {
     styleOptions.map<MenuEntry>((String name) => MenuEntry(value: name, label: name)),
   );
   @override
-  Widget build(BuildContext contex) {
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final cardCount = styleOptions.length;
+    final cardWidth = screenWidth * 0.8 / cardCount; //螢幕8成空間
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -61,24 +65,54 @@ class _StyleSelectionState extends State<StyleSelection> {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: Colors.black,
+            color: colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: 10),
-        DropdownMenu<String>(
-        initialSelection: styleOptions.first,
-        textStyle: const TextStyle(fontSize: 16),
-        width: width,
-        onSelected: (String? value) {
-          setState(() {
-            selectedStyle = value!;
-            _onStyleChanged(value);
-            updateWidth(selectedStyle!);
-          });
-        },
-        dropdownMenuEntries: menuEntries,
-        )
-      ]
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: styleOptions.map((style) {
+            final bool isSelected = selectedStyle == style;
+            return Container(
+              width: cardWidth,
+              margin: const EdgeInsets.symmetric(horizontal: 6),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    selectedStyle = style;
+                    _onStyleChanged(style);
+                    updateWidth(style);
+                  });
+                },
+                child: Card(
+                  color: isSelected ? colorScheme.primary : colorScheme.surface,
+                  elevation: isSelected ? 6 : 1,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(
+                      color: isSelected ? colorScheme.primary : colorScheme.outline,
+                      width: isSelected ? 2 : 1,
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                    child: Center(
+                      child: Text(
+                        style,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 }

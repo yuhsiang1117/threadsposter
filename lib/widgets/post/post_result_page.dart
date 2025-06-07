@@ -15,13 +15,19 @@ class _PostResultState extends State<PostResult> {
   final TextEditingController _generatedTextController = TextEditingController(
     text: '這裡將顯示 AI 生成的文字內容。點擊生成按鈕開始創建內容。',
   );
-  
   final TextEditingController _customTextController = TextEditingController();
+  // 新增一個收藏狀態列表
+  List<bool> _isFavorited = [];
+  int _editingIndex = -1;
+  List<TextEditingController> _editControllers = [];
 
   @override
   void dispose() {
     _generatedTextController.dispose();
     _customTextController.dispose();
+    for (var controller in _editControllers) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
@@ -29,6 +35,13 @@ class _PostResultState extends State<PostResult> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    // 確保收藏狀態長度與結果同步
+    if (_isFavorited.length != currentResult.length) {
+      _isFavorited = List.generate(currentResult.length, (i) => false);
+    }
+    if (_editControllers.length != currentResult.length) {
+      _editControllers = List.generate(currentResult.length, (i) => TextEditingController(text: currentResult[i].content));
+    }
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -56,26 +69,69 @@ class _PostResultState extends State<PostResult> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     _buildSectionHeader('生成文章 ${i + 1}'),
-                    _buildActionButton(
-                      label: '複製',
-                      onPressed: () {
-                        Clipboard.setData(ClipboardData(text: _generatedTextController.text));
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('文字已複製到剪貼板')),
-                        );
-                      },
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: Icon(_editingIndex == i ? Icons.check : Icons.edit),
+                          color: _editingIndex == i ? Colors.green : colorScheme.primary,
+                          tooltip: _editingIndex == i ? '儲存' : '編輯',
+                          onPressed: () {
+                            setState(() {
+                              if (_editingIndex == i) {
+                                // 儲存
+                                if (_editControllers[i].text.trim().isNotEmpty) {
+                                  currentResult[i].content = _editControllers[i].text;
+                                }
+                                _editingIndex = -1;
+                              } else {
+                                _editingIndex = i;
+                              }
+                            });
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        IconButton(
+                          icon: Icon(Icons.copy),
+                          color: colorScheme.primary,
+                          tooltip: '複製',
+                          onPressed: () {
+                            Clipboard.setData(ClipboardData(text: currentResult[i].content));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('文字已複製到剪貼板')),
+                            );
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        IconButton(
+                          icon: Icon(_isFavorited[i] ? Icons.favorite : Icons.favorite_border),
+                          color: _isFavorited[i] ? Colors.red : colorScheme.primary,
+                          tooltip: '收藏',
+                          onPressed: () {
+                            setState(() {
+                              _isFavorited[i] = !_isFavorited[i];
+                            });
+                            if (_isFavorited[i]) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('已加入收藏')),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('已取消收藏')),
+                              );
+                            }
+                          },
+                        ),
+                      ],
                     ),
                   ],
                 ),
                 const SizedBox(height: 4),
-                _buildTextArea(
-                  TextEditingController(
-                    text: (currentResult.length > i)
-                    ? currentResult[i].content
-                    : '這裡將顯示 AI 生成的文字內容。',
-                  ),
-                  readOnly: true
-                ),
+                _editingIndex == i
+                  ? _buildEditableTextArea(i)
+                  : _buildTextArea(
+                      TextEditingController(text: currentResult[i].content),
+                      readOnly: true,
+                    ),
                 const SizedBox(height: 4),
                 Align(
                   alignment: Alignment.centerRight,
@@ -157,6 +213,26 @@ class _PostResultState extends State<PostResult> {
           border: InputBorder.none,
         ),
         readOnly: readOnly,
+        style: TextStyle(color: colorScheme.onSurface),
+      ),
+    );
+  }
+
+  Widget _buildEditableTextArea(int i) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: colorScheme.primary),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: TextField(
+        controller: _editControllers[i],
+        maxLines: 5,
+        decoration: const InputDecoration(
+          hintText: '請編輯內容',
+          contentPadding: EdgeInsets.all(12),
+          border: InputBorder.none,
+        ),
         style: TextStyle(color: colorScheme.onSurface),
       ),
     );

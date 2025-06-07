@@ -95,6 +95,8 @@ class _PostState extends State<Post> {
                   ),
                 ],
               ),
+              const SizedBox(height: 20),
+              _buildTagsInputField(),
               const SizedBox(height: 10),
               StyleSelection(
                 onStyleSelected: (style) {
@@ -150,8 +152,6 @@ class _PostState extends State<Post> {
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
-              _buildTagsInputField(),
               const SizedBox(height: 20),
               _buildQueryInputField(),
               const SizedBox(height: 20),
@@ -274,7 +274,7 @@ class _PostState extends State<Post> {
     postQuery.gclikes = _selectedLikes;
     postQuery.returnCount = _selectedCount;
     // 根據 _selectedTone (name) 找到對應的 ToneOption 並設置 tone
-    final toneProvider = Provider.of<ToneProvider>(context);
+    final toneProvider = Provider.of<ToneProvider>(context, listen: false);
     final toneOptions = toneProvider.tones.isNotEmpty ? toneProvider.tones : defaultToneOptions;
     final toneOption = toneOptions.firstWhere(
       (tone) => tone.name == _selectedTone,

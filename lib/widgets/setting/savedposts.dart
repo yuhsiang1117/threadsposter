@@ -120,11 +120,11 @@ class _SavedPostState extends State<SavedPost> {
                 DropdownButton<String>(
                   value: selectedStyle,
                   underline: SizedBox(),
-                  dropdownColor: Colors.grey[900],
+                  dropdownColor: Theme.of(context).colorScheme.onPrimary,
                   items: styleOptions
                       .map((style) => DropdownMenuItem(
                             value: style,
-                            child: Text(style, style: const TextStyle(color: Colors.white)),
+                            child: Text(style, style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onSurface)),
                           ))
                       .toList(),
                   onChanged: (value) {

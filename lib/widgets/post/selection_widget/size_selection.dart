@@ -15,12 +15,29 @@ class SizeSelection extends StatefulWidget {
 class _SizeSelectionState extends State<SizeSelection> {
 
   String? selectedSize;
+  double width = 0.0;
 
   @override
   void initState() {
     super.initState();
     selectedSize = size.first;
+    updateWidth(selectedSize!);
   }
+  void updateWidth(String value) {
+    // 使用 TextPainter 計算字串寬度
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: value,
+        style: TextStyle(fontSize: 16), // 設定與下拉選單字體相同的字型大小
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+
+    setState(() {
+      width = textPainter.width + 80; // 加上左右 padding
+    });
+  }
+
   static final List<MenuEntry> menuEntries = UnmodifiableListView<MenuEntry>(
     size.map<MenuEntry>((String name) => MenuEntry(value: name, label: name)),
   );
@@ -44,7 +61,10 @@ class _SizeSelectionState extends State<SizeSelection> {
       ),
       textDirection: TextDirection.ltr,
     )..layout();
-    final width = textPainter.width + 80; // 加上左右 padding
+    final colorScheme = Theme.of(context).colorScheme;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final cardCount = size.length;
+    final cardWidth = screenWidth * 0.8 / cardCount;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,18 +78,48 @@ class _SizeSelectionState extends State<SizeSelection> {
           ),
         ),
         const SizedBox(height: 10),
-        DropdownMenu<String>(
-        initialSelection: size.first,
-        textStyle: const TextStyle(fontSize: 16),
-        width: width,
-        onSelected: (String? value) {
-          setState(() {
-            selectedSize = value!;
-            _onSizeChanged(value);
-          });
-        },
-        dropdownMenuEntries: menuEntries,
-        )
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: size.map((size) {
+            final bool isSelected = selectedSize == size;
+            return Container(
+              width: cardWidth,
+              margin: const EdgeInsets.symmetric(horizontal: 6),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    selectedSize = size;
+                    _onSizeChanged(size);
+                  });
+                },
+                child: Card(
+                  color: isSelected ? colorScheme.primary : colorScheme.surface,
+                  elevation: isSelected ? 6 : 1,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(
+                      color: isSelected ? colorScheme.primary : colorScheme.outline,
+                      width: isSelected ? 2 : 1,
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                    child: Center(
+                      child: Text(
+                        size,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
       ]
     );
   }

@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class GeneratedPost {
-  final String content;
+  String content;
   final double score;
 
   GeneratedPost({required this.content, required this.score});
