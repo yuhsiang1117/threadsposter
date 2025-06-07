@@ -48,7 +48,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   void _startTextAnimation(String text) {
     _textController.stop();
     _textController.reset();
-    _textController.duration = Duration(milliseconds: (200 * text.length).toInt());
+    _textController.duration = Duration(milliseconds: (100 * text.length).toInt());
     _textAnimation = StepTween(begin: 0, end: text.length).animate(
       CurvedAnimation(parent: _textController, curve: Curves.linear),
     );

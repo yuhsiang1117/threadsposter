@@ -60,7 +60,6 @@ const List<String> styleOptions = [
   'Practical',
   'Identity',
   'Trend',
-  'error test',
 ];
 
 const List<String> size = [

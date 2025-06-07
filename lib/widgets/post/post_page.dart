@@ -123,7 +123,13 @@ class _PostState extends State<Post> {
                 child: ExpansionTile(
                   tilePadding: EdgeInsets.zero,      // 清除 padding（選用）
                   childrenPadding: EdgeInsets.zero,  // 清除展開內容 padding（選用）
-                  title: const Text('進階選項'),
+                  title: const Text(
+                    '進階選項',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
                   children: [
                     SizedBox(height: 10),
                     DaysSlider(
@@ -281,29 +287,48 @@ class _PostState extends State<Post> {
       orElse: () => ToneOption('', _selectedTone, ''),
     ).id;
     postQuery.tone = toneOption;
-    if(toneOption == 'Custom') {
-      postQuery.specificUser = _selectedTone;
+    if(toneOption == 'custom') {
+      postQuery.specificUser = _selectedTone.substring(1);
     } else {
       postQuery.specificUser = '';
     }
   }
 
   Future<List<GeneratedPost>> _sendPostQuery(PostQuery query) async {
-    try{
-      await changeTone(tone: query.tone);
-      return await generatePost(
-        userquery: query.userQuery,
-        tag: query.tag,
-        style: query.style,
-        withindays: query.withInDays,
-        size: query.size,
-        gclikes: query.gclikes,
-        recommendation: query.returnCount,
-        specific_user: query.specificUser,
-      );
-    } catch (e) {
-      print('發生錯誤: $e');
-      return [];
+    if (query.tone == 'custom') {
+      try{
+        return await generateSpecificUserPost(
+          userquery: query.userQuery,
+          tag: query.tag,
+          style: query.style,
+          withindays: query.withInDays,
+          size: query.size,
+          gclikes: query.gclikes,
+          recommendation: query.returnCount,
+          specific_user: query.specificUser,
+        );
+      } catch (e) {
+        print('發生錯誤: $e');
+        return [];
+      }
+    }
+    else {
+      try{
+        await changeTone(tone: query.tone);
+        return await generatePost(
+          userquery: query.userQuery,
+          tag: query.tag,
+          style: query.style,
+          withindays: query.withInDays,
+          size: query.size,
+          gclikes: query.gclikes,
+          recommendation: query.returnCount,
+          specific_user: query.specificUser,
+        );
+      } catch (e) {
+        print('發生錯誤: $e');
+        return [];
+      }
     }
   }
 }

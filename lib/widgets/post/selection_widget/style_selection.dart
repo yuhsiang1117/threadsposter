@@ -73,9 +73,7 @@ class _StyleSelectionState extends State<StyleSelection> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: styleOptions.map((style) {
             final bool isSelected = selectedStyle == style;
-            return Container(
-              width: cardWidth,
-              margin: const EdgeInsets.symmetric(horizontal: 6),
+            return Expanded(
               child: GestureDetector(
                 onTap: () {
                   setState(() {
@@ -100,7 +98,6 @@ class _StyleSelectionState extends State<StyleSelection> {
                       child: Text(
                         style,
                         style: TextStyle(
-                          fontSize: 16,
                           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                           color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface,
                         ),
