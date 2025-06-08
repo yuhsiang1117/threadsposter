@@ -37,15 +37,22 @@ class _NotificationPageState extends State<NotificationPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
     return Scaffold(
       appBar: AppBar(
-        title: const Text("設定開關"),
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
+        title: Text(
+          "設定開關",
+          style: textTheme.titleLarge?.copyWith(color: colorScheme.onPrimary),
+        ),
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
       ),
       body: Center(
         child: Card(
           elevation: 4,
+          color: colorScheme.surfaceContainer,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
           child: Padding(
@@ -53,14 +60,16 @@ class _NotificationPageState extends State<NotificationPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
+                Text(
                   "功能開關",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: colorScheme.onSurface),
                 ),
                 const SizedBox(height: 16),
                 Switch(
                   value: _isOn,
-                  activeColor: Colors.deepPurple,
+                  activeColor: colorScheme.primary,
+                  inactiveThumbColor: colorScheme.outlineVariant,
+                  inactiveTrackColor: colorScheme.surfaceVariant,
                   onChanged: (bool newValue) {
                     setState(() {
                       _isOn = newValue;
@@ -70,9 +79,8 @@ class _NotificationPageState extends State<NotificationPage> {
                 ),
                 Text(
                   _isOn ? "已開啟" : "已關閉",
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: _isOn ? Colors.green : Colors.grey,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: _isOn ? colorScheme.primary : colorScheme.outline,
                   ),
                 )
               ],
@@ -80,7 +88,7 @@ class _NotificationPageState extends State<NotificationPage> {
           ),
         ),
       ),
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: colorScheme.surface,
     );
   }
 }

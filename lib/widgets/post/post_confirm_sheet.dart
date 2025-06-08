@@ -49,25 +49,42 @@ Future<(bool?, DateTime?)?> showPostConfirmSheet({
                   setState(() { schedule = false; });
                 },
                 title: const Text('立即發文'),
-              ),
+              ),  
               CheckboxListTile(
                 value: schedule,
                 onChanged: (v) async {
                   setState(() { schedule = true; });
-                  //時間選擇器
+                  // 時間選擇器
                   final now = DateTime.now();
-                  final time = await showTimePicker(
+                  final pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: now,
+                    firstDate: now,
+                    lastDate: DateTime(now.year + 1, 12, 31),
+                  );
+                  if (pickedDate == null) return;
+                  final pickedTimeOfDay = await showTimePicker(
                     context: context,
                     initialTime: TimeOfDay.fromDateTime(now),
                   );
-                  if (time != null) {
-                    pickedTime = DateTime(now.year, now.month, now.day, time.hour, time.minute);
-                    //若選擇時間已過，則視為明天
-                    if (pickedTime!.isBefore(now)) {
-                      pickedTime = pickedTime!.add(const Duration(days: 1));
-                    }
+                  if (pickedTimeOfDay == null) return;
+                  final scheduled = DateTime(
+                    pickedDate.year,
+                    pickedDate.month,
+                    pickedDate.day,
+                    pickedTimeOfDay.hour,
+                    pickedTimeOfDay.minute,
+                  );
+                  // 不允許選過去的時間
+                  if (scheduled.isBefore(now)) {
+                    setState(() {
+                      pickedTime = null;
+                    });
+                    return;
                   }
-                  setState(() {});
+                  setState(() {
+                    pickedTime = scheduled;
+                  });
                 },
                 title: const Text('排程發文'),
               ),
@@ -75,12 +92,78 @@ Future<(bool?, DateTime?)?> showPostConfirmSheet({
                 Padding(
                   padding: const EdgeInsets.only(top: 8, bottom: 8),
                   child: pickedTime == null
-                    ? const Text(
-                        '請選擇時間', 
-                        style: TextStyle(color: Colors.red)
+                    ? TextButton(
+                        onPressed: () async {
+                          final now = DateTime.now();
+                          final pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: pickedTime ?? now,
+                            firstDate: now,
+                            lastDate: DateTime(now.year + 1, 12, 31),
+                          );
+                          if (pickedDate == null) return;
+                          final pickedTimeOfDay = await showTimePicker(
+                            context: context,
+                            initialTime: pickedTime != null
+                              ? TimeOfDay(hour: pickedTime!.hour, minute: pickedTime!.minute)
+                              : TimeOfDay.fromDateTime(now),
+                          );
+                          if (pickedTimeOfDay == null) return;
+                          final scheduled = DateTime(
+                            pickedDate.year,
+                            pickedDate.month,
+                            pickedDate.day,
+                            pickedTimeOfDay.hour,
+                            pickedTimeOfDay.minute,
+                          );
+                          if (scheduled.isBefore(now)) {
+                            setState(() { pickedTime = null; });
+                            return;
+                          }
+                          setState(() { pickedTime = scheduled; });
+                        },
+                        child: const Text(
+                          '請選擇未來的時間',
+                          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
                       )
-                    : Text(
-                        '預定發文時間：${pickedTime!.hour.toString().padLeft(2, '0')}:${pickedTime!.minute.toString().padLeft(2, '0')} (${pickedTime!.month}/${pickedTime!.day})'
+                    : TextButton(
+                        onPressed: () async {
+                          final now = DateTime.now();
+                          final pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: pickedTime ?? now,
+                            firstDate: now,
+                            lastDate: DateTime(now.year + 1, 12, 31),
+                          );
+                          if (pickedDate == null) return;
+                          final pickedTimeOfDay = await showTimePicker(
+                            context: context,
+                            initialTime: pickedTime != null
+                              ? TimeOfDay(hour: pickedTime!.hour, minute: pickedTime!.minute)
+                              : TimeOfDay.fromDateTime(now),
+                          );
+                          if (pickedTimeOfDay == null) return;
+                          final scheduled = DateTime(
+                            pickedDate.year,
+                            pickedDate.month,
+                            pickedDate.day,
+                            pickedTimeOfDay.hour,
+                            pickedTimeOfDay.minute,
+                          );
+                          if (scheduled.isBefore(now)) {
+                            setState(() { pickedTime = null; });
+                            return;
+                          }
+                          setState(() { pickedTime = scheduled; });
+                        },
+                        child: Text(
+                          '預定發文時間：'
+                          '${pickedTime != null ? '${pickedTime!.year}/${pickedTime!.month}/${pickedTime!.day} ' : ''}'
+                          '${pickedTime != null ? pickedTime!.hour.toString().padLeft(2, '0') : ''}'
+                          '${pickedTime != null ? ':' + pickedTime!.minute.toString().padLeft(2, '0') : ''}',
+                          style: const TextStyle(fontSize: 16, color: Colors.blue, decoration: TextDecoration.underline),
+                        ),
                       ),
                 ),
               const SizedBox(height: 12),
