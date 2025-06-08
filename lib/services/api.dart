@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -173,6 +175,41 @@ Future<bool> post({required String text, http.Client? client}) async {
   }
   if (client == null) {
     httpClient.close(); // 只關閉自己建立的 client
+  }
+  return json['success'];
+}
+
+Future<bool> postWithSchedule({
+  required String text,
+  DateTime? time,
+  http.Client? client,
+}) async {
+  final httpClient = client ?? http.Client();
+  final url = Uri.parse('${getApiBaseUrl()}/post'); // FastAPI API
+  Map<String, dynamic> body = {'text': text};
+  if (time != null) {
+    Map<String, dynamic> schedule = {
+      'year': time.year,
+      'month': time.month,
+      'day': time.day,
+      'hour': time.hour,
+      'minute': time.minute,
+    };
+    body['schedule'] = schedule; // 添加排程時間
+  }
+  // print json
+  debugPrint('Post body: ${jsonEncode(body)}');
+  final response = await httpClient.post(
+    url,
+    body: jsonEncode(body),
+    headers: {'Content-Type': 'application/json'},
+  );
+  final json = jsonDecode(response.body);
+  if (response.statusCode != 200) {
+    throw Exception('HTTP 錯誤：${response.statusCode}');
+  }
+  if (client == null) {
+    httpClient.close();
   }
   return json['success'];
 }

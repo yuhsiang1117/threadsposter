@@ -38,12 +38,6 @@ Future<void> requestPermissions() async {
   
     await Permission.notification.request();
   }
-
-
-
-
-
-
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   debugPrint('[main] 初始化開始');

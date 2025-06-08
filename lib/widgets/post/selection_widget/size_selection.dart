@@ -38,10 +38,6 @@ class _SizeSelectionState extends State<SizeSelection> {
     });
   }
 
-  static final List<MenuEntry> menuEntries = UnmodifiableListView<MenuEntry>(
-    size.map<MenuEntry>((String name) => MenuEntry(value: name, label: name)),
-  );
-
   void _onSizeChanged(String size) {
     setState(() {
       selectedSize = size;
@@ -54,13 +50,6 @@ class _SizeSelectionState extends State<SizeSelection> {
 
   @override
   Widget build(BuildContext contex) {
-    final textPainter = TextPainter(
-      text: TextSpan(
-        text: 'medium',
-        style: TextStyle(fontSize: 16), // 設定與下拉選單字體相同的字型大小
-      ),
-      textDirection: TextDirection.ltr,
-    )..layout();
     final colorScheme = Theme.of(context).colorScheme;
     final screenWidth = MediaQuery.of(context).size.width;
     final cardCount = size.length;

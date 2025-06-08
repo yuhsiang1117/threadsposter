@@ -5,6 +5,7 @@ import 'package:threadsposter/services/api.dart';
 import 'package:threadsposter/services/UserData_provider.dart';
 import 'package:threadsposter/models/save_post.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:threadsposter/widgets/post/post_confirm_sheet.dart';
 
 List<GeneratedPost> currentResult = [];
 String currentTitle = '';
@@ -106,60 +107,88 @@ class _PostResultState extends State<PostResult> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 8),
-              // 顯示三個生成結果
-              for (int i = 0; i < currentResult.length; i++) ...[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _buildSectionHeader('生成文章 ${i + 1}'),
-                    Row(
-                      children: [
-                        IconButton(
-                          icon: Icon(_editingIndex == i ? Icons.check : Icons.edit),
-                          color: _editingIndex == i ? Colors.green : colorScheme.primary,
-                          tooltip: _editingIndex == i ? '儲存' : '編輯',
-                          onPressed: () {
-                            setState(() {
-                              if (_editingIndex == i) {
-                                // 儲存
-                                if (_editControllers[i].text.trim().isNotEmpty) {
-                                  currentResult[i].content = _editControllers[i].text;
-                                }
-                                _editingIndex = -1;
-                              } else {
-                                _editingIndex = i;
-                              }
-                            });
-                          },
-                        ),
-                        const SizedBox(width: 8),
-                        IconButton(
-                          icon: Icon(Icons.copy),
-                          color: colorScheme.primary,
-                          tooltip: '複製',
-                          onPressed: () {
-                            Clipboard.setData(ClipboardData(text: currentResult[i].content));
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('文字已複製到剪貼板')),
-                            );
-                          },
-                        ),
-                        const SizedBox(width: 8),
-                        IconButton(
-                          icon: Icon(_isFavorited[i] ? Icons.favorite : Icons.favorite_border),
-                          color: _isFavorited[i] ? Colors.red : colorScheme.primary,
-                          tooltip: '收藏',
-                          onPressed: () async {
-                            setState(() {
-                              _isFavorited[i] = !_isFavorited[i];
-                            });
+        child: Stack(
+          children: [
+            // 主內容
+            SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 8),
+                  for (int i = 0; i < currentResult.length; i++) ...[
+                    // 如果正在編輯，非編輯區塊要變灰且不可互動
+                    _editingIndex != -1 && _editingIndex != i
+                      ? Opacity(
+                          opacity: 0.4,
+                          child: IgnorePointer(
+                            child: _buildResultBlock(i),
+                          ),
+                        )
+                      : _buildResultBlock(i),
+                    const SizedBox(height: 12),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // 將每個生成文章區塊抽出，方便覆用
+  Widget _buildResultBlock(int i) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildSectionHeader('生成文章${i + 1}'),
+            Row(
+              children: [
+                IconButton(
+                  icon: Icon(_editingIndex == i ? Icons.check : Icons.edit),
+                  color: _editingIndex == i ? Colors.green : colorScheme.primary,
+                  tooltip: _editingIndex == i ? '儲存' : '編輯',
+                  onPressed: () {
+                    setState(() {
+                      if (_editingIndex == i) {
+                        // 儲存
+                        if (_editControllers[i].text.trim().isNotEmpty) {
+                          currentResult[i].content = _editControllers[i].text;
+                        }
+                        _editingIndex = -1;
+                      } else {
+                        _editingIndex = i;
+                      }
+                    });
+                  },
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: Icon(Icons.copy),
+                  color: colorScheme.primary,
+                  tooltip: '複製',
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: currentResult[i].content));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('文字已複製到剪貼板')),
+                    );
+                  },
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: Icon(_isFavorited[i] ? Icons.favorite : Icons.favorite_border),
+                  color: _isFavorited[i] ? Colors.red : colorScheme.primary,
+                  tooltip: '收藏',
+                  onPressed: () async {
+                    setState(() {
+                      _isFavorited[i] = !_isFavorited[i];
+                    });
                             final uid = Provider.of<UserDataProvider>(context, listen: false).uid;
-                            if (_isFavorited[i]) {
+                    if (_isFavorited[i]) {
                               // 將當前結果加入收藏
                               addFavoriteDB(
                                 uid!,
@@ -169,10 +198,10 @@ class _PostResultState extends State<PostResult> {
                                   style: currentStyle,
                                 )
                               );
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('已加入收藏')),
-                              );
-                            } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('已加入收藏')),
+                      );
+                    } else {
                               // 從收藏中移除
                               removeFavoriteDB(
                                 uid!,
@@ -182,75 +211,106 @@ class _PostResultState extends State<PostResult> {
                                   style: currentStyle,
                                 )
                               );
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('已取消收藏')),
-                              );
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('已取消收藏')),
+                      );
+                    }
+                  },
                 ),
-                const SizedBox(height: 4),
-                _editingIndex == i
-                  ? _buildEditableTextArea(i)
-                  : _buildTextArea(
-                      TextEditingController(text: currentResult[i].content),
-                      readOnly: true,
-                    ),
-                const SizedBox(height: 4),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(
-                        color: (currentResult.length > i)
-                          ? (currentResult[i].score >= 0.67
-                          ? Colors.green
-                          : (currentResult[i].score >= 0.33
-                            ? Colors.orange
-                            : Colors.red))
-                          : Colors.purple,
-                        width: 2,
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      '分數：${(currentResult.length > i) ? currentResult[i].score.toStringAsFixed(2) : '--'}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: (currentResult.length > i)
-                          ? (currentResult[i].score >= 0.67
-                          ? Colors.green
-                          : (currentResult[i].score >= 0.33
-                            ? Colors.orange
-                            : Colors.red))
-                          : Colors.purple,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        _editingIndex == i
+          ? _buildEditableTextArea(i)
+          : _buildTextArea(
+              TextEditingController(text: currentResult[i].content),
+              readOnly: true,
+            ),
+        const SizedBox(height: 4),
+        Align(
+          alignment: Alignment.centerRight,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(
+                    color: (currentResult.length > i)
+                      ? (currentResult[i].score >= 0.67
+                        ? Colors.green
+                        : (currentResult[i].score >= 0.33
+                          ? Colors.orange
+                          : Colors.red))
+                      : Colors.purple,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  '分數：${(currentResult.length > i) ? currentResult[i].score.toStringAsFixed(2) : '--'}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: (currentResult.length > i)
+                      ? (currentResult[i].score >= 0.67
+                        ? Colors.green
+                        : (currentResult[i].score >= 0.33
+                          ? Colors.orange
+                          : Colors.red))
+                      : Colors.purple,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 12),
-              ],
-              // _buildActionButtons(),
-              const SizedBox(height: 16),
-              _buildSectionHeader('重新輸入'),
-              const SizedBox(height: 8),
-              _buildTextArea(
-                _customTextController,
-                hintText: '您可以在這裡編輯或重新輸入想要的內容...',
-                readOnly: false,
               ),
-              const SizedBox(height: 24),
-              _buildBottomButtons(),
+              const SizedBox(width: 8),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.send),
+                label: const Text('發文'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: colorScheme.onPrimary,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                onPressed: _editingIndex == i ? null : () async {
+                  // 使用獨立檔案的確認 sheet
+                  final result = await showPostConfirmSheet(
+                    context: context,
+                    content: currentResult[i].content,
+                  );
+                  if (result == null) return;
+                  final isSchedule = result.$1;
+                  final scheduleTime = result.$2;
+                  try {
+                    final success = await postWithSchedule(
+                      text: currentResult[i].content,
+                      time: isSchedule == true ? scheduleTime : null,
+                    );
+                    if (success) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('發文成功')),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('發文失敗')),
+                      );
+                    }
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('發文失敗: $e')),
+                    );
+                  }
+                },
+              ),
             ],
           ),
         ),
-      ),
+      ],
     );
   }
 
@@ -287,10 +347,22 @@ class _PostResultState extends State<PostResult> {
 
   Widget _buildEditableTextArea(int i) {
     final colorScheme = Theme.of(context).colorScheme;
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
-        border: Border.all(color: colorScheme.primary),
-        borderRadius: BorderRadius.circular(8),
+        color: colorScheme.primary.withOpacity(0.08), // 編輯時有主題色淡底
+        border: Border.all(
+          color: colorScheme.primary,
+          width: 2.5, // 邊框加粗
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.primary.withOpacity(0.25),
+            blurRadius: 8,
+            spreadRadius: 1,
+          ),
+        ],
+        borderRadius: BorderRadius.circular(10),
       ),
       child: TextField(
         controller: _editControllers[i],
