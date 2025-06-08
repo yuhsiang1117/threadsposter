@@ -40,6 +40,12 @@ final routerConfig = GoRouter(
       ),
       routes: <RouteBase>[
         GoRoute(
+          path: 'edit_profile',
+          pageBuilder: (context, state) => const NoTransitionPage<void>(
+            child: EditProfilePage()
+          ),
+        ),
+        GoRoute(
           path: 'favorites',
           pageBuilder: (context, state) => const NoTransitionPage<void>(
             child: SavedPostPage()
@@ -64,9 +70,9 @@ final routerConfig = GoRouter(
           ),
         ),
         GoRoute(
-          path: 'edit_profile',
+          path: 'api_setting',
           pageBuilder: (context, state) => const NoTransitionPage<void>(
-            child: EditProfilePage()
+            child: APIConfigPage()
           ),
         )
       ]
@@ -152,6 +158,10 @@ class NavigationService {
     currentStyle = style;
   }
 
+  void goEditProflie() {
+    routerConfig.go('/setting/edit_profile');
+  }
+
   void goSavedPosts() {
     routerConfig.go('/setting/favorites');
   }
@@ -167,12 +177,15 @@ class NavigationService {
   void goApiTest() {
     routerConfig.go('/setting/API_test');
   }
-  void goEditProflie() {
-    routerConfig.go('/setting/edit_profile');
+
+  void goApisetting() {
+    routerConfig.go('/setting/api_setting');
   }
+  
   void goFirstLogin() {
     routerConfig.go('/firstlogin');
   }
+  
   void goRegister() {
     routerConfig.go('/register');
   }

@@ -142,16 +142,18 @@ class Setting extends StatefulWidget {
             ),
             _buildDivider(),
             _buildMenuItem(
-              icon: Icons.security,
-              title: '隱私設定',
-              onTap: () {},
+              icon: Icons.app_settings_alt,
+              title: 'API 設定',
+              onTap: () {
+                navigationService.goApisetting();
+              },
             ),
-            _buildDivider(),
-            _buildMenuItem(
-              icon: Icons.help,
-              title: '幫助與支援',
-              onTap: () {},
-            ),
+            // _buildDivider(),
+            // _buildMenuItem(
+            //   icon: Icons.help,
+            //   title: '幫助與支援',
+            //   onTap: () {},
+            // ),
             _buildDivider(),
             _buildMenuItem(
               icon: Icons.logout,
