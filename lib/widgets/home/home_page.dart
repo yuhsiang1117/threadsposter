@@ -12,6 +12,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 String customTone = '';
 int currentPage = 0;
+bool isInitialized = false;
+bool isUserExist = false;
 
 Future<bool> checkUserDocumentExists(String? uid) async {
   try {
@@ -21,6 +23,10 @@ Future<bool> checkUserDocumentExists(String? uid) async {
         .collection('profile')
         .doc('info');
     final docSnapshot = await docRef.get();
+    // 將結果儲存避免重複查詢
+    if (!isUserExist && docSnapshot.exists) {
+      isUserExist = true;
+    }
     return docSnapshot.exists;
   } catch (e) {
     print('Error checking document: $e');
@@ -46,20 +52,28 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    debugPrint('[lib/widgets/home/home_page.dart] Home Page Initializing...');
+    debugPrint('[lib/widgets/home/home_page.dart] Home Page Building...');
     super.initState();
     carouselController = InfiniteScrollController(initialItem: currentPage);
     uid = context.read<UserDataProvider>().uid;
-    _future = checkUserDocumentExists(uid);
+    if (!isUserExist){
+      _future = checkUserDocumentExists(uid);
+    }
+    else {
+      _future = Future.value(true);
+    }
     // 做你想做的事，例如發出請求或設定變數
     _textController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 1000),
     );
-    Future.microtask((){
-      // ignore: use_build_context_synchronously
-      Provider.of<ToneProvider>(context, listen: false).fetchTones();
-    });
+    if (!isInitialized) {
+      Future.microtask((){
+        // ignore: use_build_context_synchronously
+        Provider.of<ToneProvider>(context, listen: false).fetchTones();
+      });
+      isInitialized = true;
+    }
   }
 
   @override
@@ -124,6 +138,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
     // 如果沒有載入語氣選項，顯示載入中指示器
     if (toneOptions.isEmpty) {
+      debugPrint('[lib/widgets/home/home_page.dart] No tone options available, showing loading indicator');
       return const Center(child: CircularProgressIndicator());
     }
 
@@ -298,16 +313,30 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                   flex: 3,
                   child: Container(
                     width: double.infinity,
-                    color: Colors.white,
+                    color: Colors.white.withAlpha(180),
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                    child: Text(
-                      toneOptions[currentPage]
-                        .description
-                        .substring(0, _textAnimation.value),
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Theme.of(context).colorScheme.primary.withAlpha(200),
-                        fontSize: 22,
-                      ),
+                    child: Stack(
+                      children: [ 
+                        Text(
+                          toneOptions[currentPage].description.substring(0, _textAnimation.value),
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            foreground: Paint()
+                              ..style = PaintingStyle.stroke
+                              ..strokeWidth = 2
+                              ..color = Colors.white,
+                          ),
+                        ),
+                        Text(
+                          toneOptions[currentPage].description.substring(0, _textAnimation.value),
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.primary.withAlpha(200),
+                          ),
+                        ),
+                      ]
                     ),
                   ),
                 ),
