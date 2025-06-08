@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:threadsposter/widgets/setting/edit_profile.dart';
+import 'package:provider/provider.dart';
+import 'package:threadsposter/models/data_lists.dart';
 import 'package:threadsposter/widgets/widgets.dart';
 import 'package:threadsposter/services/api.dart';
 import 'package:threadsposter/widgets/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:threadsposter/models/query_history.dart';
+
 final routerConfig = GoRouter(
   initialLocation: '/home',
   debugLogDiagnostics: true,
@@ -118,9 +122,23 @@ class NavigationService {
     routerConfig.go('/home');
   }
 
-  void goPost({required String tone}) {
+  void goPost({
+    required String tone, 
+    bool fromHistory = false, 
+    QueryHistory? query,
+  }) {
     routerConfig.go('/post');
     currentTone = tone;
+    if (fromHistory && query != null) {
+      queryFromHistory = QueryHistory(
+        title: query.title,
+        tag: query.tag,
+        style: query.style,
+        size: query.size,
+        specific_user: query.specific_user,
+        tone: tone
+      );
+    }
   }
 
   void goSetting() {

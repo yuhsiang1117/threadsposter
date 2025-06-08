@@ -11,7 +11,6 @@ import 'package:infinite_carousel/infinite_carousel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 String customTone = '';
-int currentPage = 0;
 bool isInitialized = false;
 bool isUserExist = false;
 
@@ -49,11 +48,14 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   late AnimationController _textController;
   late Animation<int> _textAnimation;
   String _lastDescription = '';
+  late int currentPage;
 
   @override
   void initState() {
-    debugPrint('[lib/widgets/home/home_page.dart] Home Page Building...');
     super.initState();
+    final toneProvider = Provider.of<ToneProvider>(context, listen: false);
+    currentPage = toneProvider.currentPage;
+    debugPrint('[lib/widgets/home/home_page.dart] Home Page Building...');
     carouselController = InfiniteScrollController(initialItem: currentPage);
     uid = context.read<UserDataProvider>().uid;
     if (!isUserExist){
@@ -265,7 +267,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                         Expanded(
                           child: Container(
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.secondary,
                             ),
                             child: currentPage == toneOptions.length - 1
                               ? Center(
@@ -295,7 +297,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                               isDense: true,
                                               contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
                                             ),
-                                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
+                                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
                                           ),
                                         ),
                                       ],
@@ -303,9 +305,28 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                   ),
                                 )
                               : Center(
-                                  child: Text(
-                                    toneOptions[currentPage].name,
-                                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
+                                  child: Stack(
+                                    children: [ 
+                                      Text(
+                                        toneOptions[currentPage].name,
+                                        style: TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                          foreground: Paint()
+                                            ..style = PaintingStyle.stroke
+                                            ..strokeWidth = 2
+                                            ..color = Colors.white,
+                                        ),
+                                      ),
+                                      Text(
+                                        toneOptions[currentPage].name,
+                                        style: TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black
+                                        ),
+                                      ),
+                                    ]
                                   ),
                                 ),
                           ),
@@ -318,7 +339,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                   flex: 3,
                   child: Container(
                     width: double.infinity,
-                    color: Colors.white.withAlpha(180),
+                    color: Theme.of(context).colorScheme.secondary,
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                     child: Stack(
                       children: [ 
@@ -330,7 +351,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                             foreground: Paint()
                               ..style = PaintingStyle.stroke
                               ..strokeWidth = 2
-                              ..color = Theme.of(context).colorScheme.primary.withAlpha(200)
+                              ..color = Colors.white,
                           ),
                         ),
                         Text(
@@ -338,7 +359,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: Colors.black
                           ),
                         ),
                       ]

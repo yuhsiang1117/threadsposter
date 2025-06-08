@@ -26,6 +26,42 @@ class ToneProvider with ChangeNotifier {
     _toneOptions = await updateToneOptions();
     notifyListeners();
   }
+
+  String nameToId(String name) {
+    for (int i = 0; i < _toneOptions.length; i++) {
+      if (_toneOptions[i].name == name) {
+        return _toneOptions[i].id;
+      }
+    }
+    return ''; // 如果找不到，返回空字串
+  }
+
+  String idToName(String id) {
+    for (int i = 0; i < _toneOptions.length; i++) {
+      if (_toneOptions[i].id == id) {
+        return _toneOptions[i].name;
+      }
+    }
+    return 'none'; // 如果找不到，返回 'none'
+  }
+
+  int nameToIndex(String name) {
+    for (int i = 0; i < _toneOptions.length; i++) {
+      if (_toneOptions[i].name == name) {
+        return i;
+      }
+    }
+    return 0; // 如果找不到，返回 0
+  }
+
+  int idToIndex(String id) {
+    for (int i = 0; i < _toneOptions.length; i++) {
+      if (_toneOptions[i].id == id) {
+        return i;
+      }
+    }
+    return 0; // 如果找不到，返回 0
+  }
 }
 
 List<ToneOption> defaultToneOptions = [

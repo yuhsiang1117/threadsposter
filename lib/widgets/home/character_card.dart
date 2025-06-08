@@ -16,7 +16,9 @@ class CharacterCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final toneOptions = Provider.of<ToneProvider>(context, listen: false).tones;
+    final toneProvider = Provider.of<ToneProvider>(context, listen: true);
+    final toneOptions = toneProvider.tones;
+    final currentPage = toneProvider.currentPage;
     
     return GestureDetector(
       onTap: index != currentPage 

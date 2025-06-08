@@ -4,9 +4,13 @@ import 'package:threadsposter/models/data_lists.dart';
 import 'package:threadsposter/services/navigation.dart';
 import 'package:threadsposter/widgets/widgets.dart';
 import 'package:threadsposter/models/post_query.dart';
+import 'package:threadsposter/models/query_history.dart';
 import 'package:threadsposter/services/api.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:threadsposter/services/UserData_provider.dart';
 
 String currentTone = '';
+QueryHistory? queryFromHistory;
 
 class Post extends StatefulWidget {
   const Post({super.key});
@@ -37,9 +41,20 @@ class _PostState extends State<Post> {
     size: parseSize("Short"),
     gclikes: 1000,
     returnCount: 3,
-    tone: 'None',
+    tone: 'none',
     specificUser: '',
   );
+
+  @override
+  void initState() {
+    super.initState();
+    if (queryFromHistory != null) {
+      _tagsController.text = queryFromHistory!.tag;
+      _queryController.text = queryFromHistory!.title;
+      _selectedStyle = queryFromHistory!.style;
+      _selectedSize = parseSize(queryFromHistory!.size);
+    }
+  }
 
   @override
   void dispose() {
@@ -56,7 +71,7 @@ class _PostState extends State<Post> {
     final currentTone = tones.isNotEmpty && currentPage < tones.length ? tones[currentPage].name : 'none';
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    _selectedTone = currentTone;
+    _selectedTone = queryFromHistory != null ? toneProvider.idToName(queryFromHistory!.tone) : currentTone;
     return Scaffold(
       backgroundColor: colorScheme.surfaceContainer,
       appBar: AppBar(
@@ -67,7 +82,14 @@ class _PostState extends State<Post> {
             navigationService.goHome();
           },
         ),
-        title: Text('發文', style: theme.textTheme.titleLarge?.copyWith(color: colorScheme.onPrimary)),
+        title: Text(
+                '發文',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.onPrimary,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
+                ),
+              ),
         backgroundColor: colorScheme.primary,
         foregroundColor: colorScheme.onPrimary,
         elevation: 2,
@@ -209,45 +231,56 @@ class _PostState extends State<Post> {
               _isGenerating = true;
             });
             _buildPostQuery();
+            addHistoryDB(
+              Provider.of<UserDataProvider>(context, listen: false).uid!,
+              QueryHistory(
+                title: postQuery.userQuery,
+                tone: Provider.of<ToneProvider>(context, listen: false).idToName(postQuery.tone),
+                tag: postQuery.tag,
+                style: postQuery.style,
+                size: postQuery.size == 10 ? 'Short' : postQuery.size == 30 ? 'Medium' : 'Long',
+                specific_user: postQuery.tone == 'custom'? '' : postQuery.specificUser,
+              ),
+            );
             debugPrint('PostQuery: \\${postQuery.toString()}');
             final navigationService = Provider.of<NavigationService>(context, listen: false);
             //測試文章
-            List<GeneratedPost> testPosts = [
-              GeneratedPost(
-                content: '這是一篇測試文章內容 1',
-                score: 5.6,
-              ),
-              GeneratedPost(
-                content: '這是第二篇測試文章內容',
-                score: 0.85,
-              ),
-              GeneratedPost(
-                content: '第三篇測試文章',
-                score: -3.75,
-              ),
-            ];
+            // List<GeneratedPost> testPosts = [
+            //   GeneratedPost(
+            //     content: '這是一篇測試文章內容 1',
+            //     score: 5.6,
+            //   ),
+            //   GeneratedPost(
+            //     content: '這是第二篇測試文章內容',
+            //     score: 0.85,
+            //   ),
+            //   GeneratedPost(
+            //     content: '第三篇測試文章',
+            //     score: -3.75,
+            //   ),
+            // ];
             //navigationService.goPostResult(testPosts);
-            // _sendPostQuery(postQuery).then((result) {
-            //   setState(() {
-            //     _isGenerating = false;
-            //   });
-            //   if (result.isEmpty) {
-            //     setState(() {
-            //       _errorMessage = '生成文章失敗，請稍後再試';
-            //     });
-            //     ScaffoldMessenger.of(context).showSnackBar(
-            //       const SnackBar(
-            //         content: Text('生成文章失敗，請稍後再試'),
-            //         backgroundColor: Colors.red,
-            //       ),
-            //     );
-            //     return;
-            //   }
-            //   setState(() {
-            //     _errorMessage = '';
-            //   });
-            //   navigationService.goPostResult(result);
-            // });
+            _sendPostQuery(postQuery).then((result) {
+              setState(() {
+                _isGenerating = false;
+              });
+              if (result.isEmpty) {
+                setState(() {
+                  _errorMessage = '生成文章失敗，請稍後再試';
+                });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('生成文章失敗，請稍後再試'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+              setState(() {
+                _errorMessage = '';
+              });
+              navigationService.goPostResult(result, postQuery.userQuery, postQuery.style);
+            });
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: _isGenerating ? colorScheme.outline : colorScheme.primary,
@@ -293,6 +326,23 @@ class _PostState extends State<Post> {
     } else {
       postQuery.specificUser = '';
     }
+  }
+
+  void addHistoryDB(String uid, QueryHistory content) async {
+    final docRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('history')
+        .doc(); // 使用自動生成的文檔 Id
+
+    await docRef.set({
+      'title': content.title,
+      'tone': content.tone,
+      'tag': content.tag,
+      'style': content.style,
+      'size': content.size,
+      'savedAt': FieldValue.serverTimestamp(), // 添加時間戳
+    });
   }
 
   Future<List<GeneratedPost>> _sendPostQuery(PostQuery query) async {
