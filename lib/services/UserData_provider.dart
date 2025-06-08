@@ -23,6 +23,7 @@ class UserDataProvider extends ChangeNotifier {
       .get();
 
     userinfo = doc.data();
+    notifyListeners();
   }
 
   UserDataProvider() : uid = FirebaseAuth.instance.currentUser?.uid {

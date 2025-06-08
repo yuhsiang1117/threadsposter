@@ -212,42 +212,42 @@ class _PostState extends State<Post> {
             debugPrint('PostQuery: \\${postQuery.toString()}');
             final navigationService = Provider.of<NavigationService>(context, listen: false);
             //測試文章
-            // List<GeneratedPost> testPosts = [
-            //   GeneratedPost(
-            //     content: '這是一篇測試文章內容 1',
-            //     score: 5.6,
-            //   ),
-            //   GeneratedPost(
-            //     content: '這是第二篇測試文章內容',
-            //     score: 0.85,
-            //   ),
-            //   GeneratedPost(
-            //     content: '第三篇測試文章',
-            //     score: -3.75,
-            //   ),
-            // ];
-            // navigationService.goPostResult(testPosts);
-            _sendPostQuery(postQuery).then((result) {
-              setState(() {
-                _isGenerating = false;
-              });
-              if (result.isEmpty) {
-                setState(() {
-                  _errorMessage = '生成文章失敗，請稍後再試';
-                });
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('生成文章失敗，請稍後再試'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-                return;
-              }
-              setState(() {
-                _errorMessage = '';
-              });
-              navigationService.goPostResult(result, postQuery.userQuery, postQuery.style);
-            });
+            List<GeneratedPost> testPosts = [
+              GeneratedPost(
+                content: '這是一篇測試文章內容 1',
+                score: 5.6,
+              ),
+              GeneratedPost(
+                content: '這是第二篇測試文章內容',
+                score: 0.85,
+              ),
+              GeneratedPost(
+                content: '第三篇測試文章',
+                score: -3.75,
+              ),
+            ];
+            //navigationService.goPostResult(testPosts);
+            // _sendPostQuery(postQuery).then((result) {
+            //   setState(() {
+            //     _isGenerating = false;
+            //   });
+            //   if (result.isEmpty) {
+            //     setState(() {
+            //       _errorMessage = '生成文章失敗，請稍後再試';
+            //     });
+            //     ScaffoldMessenger.of(context).showSnackBar(
+            //       const SnackBar(
+            //         content: Text('生成文章失敗，請稍後再試'),
+            //         backgroundColor: Colors.red,
+            //       ),
+            //     );
+            //     return;
+            //   }
+            //   setState(() {
+            //     _errorMessage = '';
+            //   });
+            //   navigationService.goPostResult(result);
+            // });
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: _isGenerating ? colorScheme.outline : colorScheme.primary,

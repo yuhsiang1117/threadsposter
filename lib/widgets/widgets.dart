@@ -15,7 +15,9 @@ export 'package:threadsposter/widgets/post/selection_widget/likes_slider.dart';
 export 'package:threadsposter/widgets/post/selection_widget/count_slider.dart';
 //Setting
 export 'package:threadsposter/widgets/setting/setting_page.dart';
+export 'package:threadsposter/widgets/setting/first_login.dart';
 export 'package:threadsposter/widgets/setting/login.dart';
+export 'package:threadsposter/widgets/register.dart';
 export 'package:threadsposter/widgets/setting/savedposts_page.dart';
 export 'package:threadsposter/widgets/setting/history_page.dart';
 export 'package:threadsposter/widgets/setting/notification_page.dart';

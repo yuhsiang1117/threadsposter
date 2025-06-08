@@ -92,7 +92,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     _textController.forward();
   }
 
-  void _refresh() {
+  void refresh() {
     setState(() {
       _future = checkUserDocumentExists(uid);
     });
@@ -121,7 +121,12 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
         print(uid);
         if (isExistingUser == false) {
           // 可以導去首次登入設定頁面，也可以顯示引導訊息
-          return FirstLoginPage(onRefresh: _refresh);
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+              final navigationService = Provider.of<NavigationService>(context, listen: false);
+              navigationService.goFirstLogin();
+            }
+          );
+          return const SizedBox();
         }
 
         // ✅ 如果使用者不是第一次登入，就顯示原本的 Home UI

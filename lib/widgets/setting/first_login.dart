@@ -4,11 +4,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:threadsposter/services/UserData_provider.dart';
-
+import 'package:threadsposter/services/navigation.dart';
 
 class FirstLoginPage extends StatefulWidget {
-  final VoidCallback onRefresh;
-  const FirstLoginPage({super.key, required this.onRefresh});
+  const FirstLoginPage({super.key});
   
   @override
   State<FirstLoginPage> createState() => _FirstLoginPageState();
@@ -48,8 +47,10 @@ class _FirstLoginPageState extends State<FirstLoginPage> {
     if (context.mounted) {
       context.read<UserDataProvider>().refreshData();
     }
-    
-}
+    else {
+      debugPrint('Context is not mounted, cannot refresh data.');
+    }  
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +74,8 @@ class _FirstLoginPageState extends State<FirstLoginPage> {
             ElevatedButton(
               onPressed: () async {
                 await _saveProfile(context);
-                widget.onRefresh();
+                final navigationService = Provider.of<NavigationService>(context, listen: false);
+                navigationService.goHome();
               },
               child: const Text('儲存'),
             ),

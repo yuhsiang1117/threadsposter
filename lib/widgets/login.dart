@@ -36,73 +36,51 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _registerWithEmail() async {
-    setState(() => _isSigningIn = true);
-    try {
-      final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
-      print('✅ 註冊成功，已自動登入');
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('註冊成功')),
-      );
-      // 先詢問使用者是否要關聯 Google 帳號
-      final shouldLink = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('關聯 Google 帳號'),
-          content: Text('註冊成功，是否要關聯 Google 帳號？'),
-          actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(false),
-          child: Text('否'),
-        ),
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(true),
-          child: Text('是'),
-        ),
+    print('開始註冊');
+    final navigationService = Provider.of<NavigationService>(context, listen: false);
+    navigationService.goRegister();
+  }
+
+  Future<String?> showPasswordInputDialog(BuildContext context, String email) {
+  final TextEditingController _passwordController = TextEditingController();
+
+  return showDialog<String>(
+    context: context,
+    barrierDismissible: false, // 點背景不會關閉 dialog
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('關聯帳號'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('你已擁有帳號（$email），將自動關聯，請輸入密碼:'),
+            SizedBox(height: 12),
+            TextField(
+              controller: _passwordController,
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: '密碼',
+                border: OutlineInputBorder(),
+              ),
+            ),
           ],
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(null), // 使用者取消
+            child: Text('取消'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop(_passwordController.text);
+            },
+            child: Text('確認'),
+          ),
+        ],
       );
-
-      if (shouldLink == true) {
-        final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-        if (googleUser != null) {
-          final googleAuth = await googleUser.authentication;
-          final googleCredential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-          );
-          try {
-        await userCredential.user?.linkWithCredential(googleCredential);
-        print('已成功關聯 Google 帳號');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('已成功關聯 Google 帳號')),
-        );
-          } on FirebaseAuthException catch (e) {
-        if (e.code == 'credential-already-in-use') {
-          // Google 已被其他帳號關聯，提示用戶用 Google 登入
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('此 Google 帳號已被其他帳號關聯，請直接用 Google 登入')),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Google 關聯失敗：${e.message}')),
-          );
-        }
-          }
-        }
-      }
-    } on FirebaseAuthException catch (e) {
-      print('❌ 註冊失敗：${e.message}');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('註冊失敗：${e.message}')),
-      );
-    } finally {
-      setState(() => _isSigningIn = false);
-    }
-  }
+    },
+  );
+}
 
   Future<void> _signInWithGoogle() async {
   setState(() => _isSigningIn = true);
@@ -131,25 +109,7 @@ class _LoginPageState extends State<LoginPage> {
     final hasEmail = providers.contains('password');
     if (!hasEmail) {
       // 先詢問是否要關聯 Email
-      final shouldLink = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('關聯 Email/密碼'),
-          content: Text('您要將此 Google 帳號關聯 Email/密碼登入嗎？'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: Text('否'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: Text('是'),
-            ),
-          ],
-        ),
-      );
-      if (shouldLink == true) {
-        final password = await _showPasswordDialog();
+      final password = await _showPasswordDialog();
         // 尚未連結，彈窗請用戶輸入密碼
         if (password != null && password.isNotEmpty) {
           try {
@@ -167,14 +127,56 @@ class _LoginPageState extends State<LoginPage> {
             );
           }
         }
-      }
     }
     print('✅ Google 登入成功');
-  } catch (e) {
-    print('❌ Google 登入失敗：$e');
-  } finally {
-    setState(() => _isSigningIn = false);
+  } on FirebaseAuthException catch (e) {
+  if (e.code == 'account-exists-with-different-credential') {
+    // 🟡 錯誤代表這個 email 已用其他登入方式（例如 email/password）註冊
+    String email = e.email!;
+    AuthCredential pendingCredential = e.credential!;
+
+    // 查出目前這個 email 支援哪些登入方式
+    List<String> signInMethods =
+        await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
+
+    if (signInMethods.contains('password')) {
+  // 要求使用者輸入密碼
+    String password = await showPasswordInputDialog(context, email) ?? '';
+
+    if (password.isEmpty) {
+      // 使用者取消或未輸入密碼
+      return;
+    }
+
+    try {
+      // 登入原帳號
+      UserCredential emailUserCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      // 🔗 將 Google 資訊與此帳號關聯
+      await emailUserCredential.user!.linkWithCredential(pendingCredential);
+
+      print("Google 成功連結到原本帳號");
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'wrong-password') {
+        // 顯示錯誤提示
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('密碼錯誤，請再試一次')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('登入失敗：${e.message}')),
+        );
+      }
+    }
   }
+  } else {
+    print("登入錯誤: ${e.message}");
+  }
+}
 }
 
 // 彈窗讓用戶輸入密碼
@@ -184,7 +186,7 @@ Future<String?> _showPasswordDialog() async {
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: Text('設定密碼'),
+        title: Text('你已經擁有帳號，請設定密碼：'),
         content: TextField(
           autofocus: true,
           obscureText: true,
@@ -210,20 +212,6 @@ Future<String?> _showPasswordDialog() async {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          '登入/註冊',
-          style: theme.textTheme.titleLarge?.copyWith(
-            color: theme.colorScheme.onPrimary,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.2,
-          ),
-        ),
-        centerTitle: false,
-        backgroundColor: theme.colorScheme.primary,
-        foregroundColor: theme.colorScheme.onPrimary,
-        elevation: 2,
-      ),
       backgroundColor: theme.colorScheme.surface,
       body: Center(
         child: SingleChildScrollView(
@@ -318,10 +306,8 @@ Future<String?> _showPasswordDialog() async {
                           SizedBox(
                             width: double.infinity,
                             child: OutlinedButton(
-                              onPressed: () async {
-                                await _registerWithEmail();
-                                final navigationService = Provider.of<NavigationService>(context, listen: false);
-                                navigationService.goHome();
+                              onPressed: () {
+                                _registerWithEmail();
                               },
                               style: OutlinedButton.styleFrom(
                                 padding: EdgeInsets.symmetric(vertical: 14),

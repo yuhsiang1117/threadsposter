@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:threadsposter/widgets/setting/edit_profile.dart';
 import 'package:threadsposter/widgets/widgets.dart';
 import 'package:threadsposter/services/api.dart';
 import 'package:threadsposter/widgets/login.dart';
@@ -8,12 +9,6 @@ final routerConfig = GoRouter(
   initialLocation: '/home',
   debugLogDiagnostics: true,
   routes: <RouteBase>[
-    GoRoute(
-      path: '/login',
-      pageBuilder: (context, state) => NoTransitionPage<void>(
-        child: LoginPage()
-      ),
-    ),
     GoRoute(
       path: '/home',
       pageBuilder: (context, state) => const NoTransitionPage<void>(
@@ -63,8 +58,32 @@ final routerConfig = GoRouter(
           pageBuilder: (context, state) => const NoTransitionPage<void>(
             child: ApiTestPage()
           ),
+        ),
+        GoRoute(
+          path: 'edit_profile',
+          pageBuilder: (context, state) => const NoTransitionPage<void>(
+            child: EditProfilePage()
+          ),
         )
       ]
+    ),
+    GoRoute(
+      path: '/login',
+      pageBuilder: (context, state) => NoTransitionPage<void>(
+        child: LoginPage()
+      ),
+    ),
+    GoRoute(
+      path: '/register',
+      pageBuilder: (context, state) => NoTransitionPage<void>(
+        child: RegisterPage()
+      ),
+    ),
+   GoRoute(
+      path: '/firstlogin',
+      pageBuilder: (context, state) => NoTransitionPage<void>(
+        child: FirstLoginPage()
+      ),
     ),
   ],
   redirect: (context, state) {
@@ -74,9 +93,9 @@ final routerConfig = GoRouter(
     }
     //login
     final User? currentUser = FirebaseAuth.instance.currentUser;
-    final bool goingToLoginPage = (state.uri.path == '/login_check' || state.uri.path == '/login');
+    final bool goingToLoginPage = ((state.uri.path == '/login_check' || state.uri.path == '/login') || state.uri.path == '/register');
     if (currentUser == null && !goingToLoginPage) {
- // User is not logged in and trying to access a route
+    // User is not logged in and trying to access a route
       return '/login';
     }
     return null;
@@ -97,9 +116,6 @@ class NavigationService {
 
   void goHome() {
     routerConfig.go('/home');
-  }
-  void goLogin() {
-    routerConfig.go('/login_check');
   }
 
   void goPost({required String tone}) {
@@ -132,6 +148,15 @@ class NavigationService {
 
   void goApiTest() {
     routerConfig.go('/setting/API_test');
+  }
+  void goEditProflie() {
+    routerConfig.go('/setting/edit_profile');
+  }
+  void goFirstLogin() {
+    routerConfig.go('/firstlogin');
+  }
+  void goRegister() {
+    routerConfig.go('/register');
   }
   // To work with the web browser history, do not use Navigator.push() or pop() directly
   // void pushFiltersOnHome({required BuildContext context}) {

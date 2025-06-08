@@ -29,21 +29,22 @@ class Setting extends StatefulWidget {
     Widget build(BuildContext context) {
       _name = context.watch<UserDataProvider>().userinfo?['name'];
       _email = context.watch<UserDataProvider>().userinfo?['email'];
+      final theme = Theme.of(context);
+      final colorScheme = theme.colorScheme;
       return Scaffold(
         appBar: AppBar(
-            title: Text(
-              '設定',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: Theme.of(context).colorScheme.onPrimary,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.2,
-              ),
-            ),
-            centerTitle: false,
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            foregroundColor: Theme.of(context).colorScheme.onPrimary,
-            elevation: 2,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              final navigationService = Provider.of<NavigationService>(context, listen: false);
+              navigationService.goHome();
+            },
           ),
+          title: Text('設定', style: theme.textTheme.titleLarge?.copyWith(color: colorScheme.onPrimary)),
+          backgroundColor: colorScheme.primary,
+          foregroundColor: colorScheme.onPrimary,
+          elevation: 2,
+        ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: ListView(
@@ -58,55 +59,49 @@ class Setting extends StatefulWidget {
     }
 
     Widget _buildProfileSection() {
+      final navigationService = Provider.of<NavigationService>(context, listen: false);
       return Card(
-        elevation: 2,
-        child: Stack(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  const CircleAvatar(
-                    radius: 40,
-                    backgroundImage: AssetImage('assets/profile_placeholder.png'),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    _name!,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    _email!,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: _navigateToEditProfile,
-                    child: const Text('編輯個人資料'),
-                  ),
-                ],
-              ),
-            ),
-            Positioned(
-              top: 8,
-              left: 8,
-              child: IconButton(
-                icon: const Icon(Icons.arrow_back), // 或 Icons.arrow_back
-                onPressed: () {
-                  final navigationService = Provider.of<NavigationService>(context, listen: false);
-                  navigationService.goHome();
-                },
-              ),
-            ),
-          ],
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const CircleAvatar(
+          radius: 40,
+          backgroundImage: AssetImage('assets/profile_placeholder.png'),
+          ),
+          const SizedBox(height: 16),
+          Text(
+          _name ?? '',
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+          textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+          _email ?? '',
+          style: const TextStyle(
+            fontSize: 16,
+            color: Colors.grey,
+          ),
+          textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          Center(
+          child: ElevatedButton(
+            onPressed: () {
+              navigationService.goEditProflie();
+            },
+            child: const Text('編輯個人資料'),
+          ),
+          ),
+        ],
         ),
+      ),
       );
     }
 
