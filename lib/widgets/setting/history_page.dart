@@ -39,6 +39,7 @@ class _HistoryPageState extends State<HistoryPage> {
           specific_user: data['specific_user'] ?? '',
           queryTime: data['savedAt'] ?? Timestamp.now(),
         ));
+        queryHistorys.sort((a, b) => b.queryTime.compareTo(a.queryTime));
       }
     });
   }
