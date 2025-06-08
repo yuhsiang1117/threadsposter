@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:threadsposter/models/data_lists.dart';
 import 'package:threadsposter/services/navigation.dart';
-import 'package:threadsposter/services/UserData_provider.dart';
 import 'package:threadsposter/widgets/widgets.dart';
 import 'package:threadsposter/models/post_query.dart';
 import 'package:threadsposter/services/api.dart';
@@ -59,6 +58,7 @@ class _PostState extends State<Post> {
     final colorScheme = theme.colorScheme;
     _selectedTone = currentTone;
     return Scaffold(
+      backgroundColor: colorScheme.surfaceContainer,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -309,7 +309,7 @@ class _PostState extends State<Post> {
           specific_user: query.specificUser,
         );
       } catch (e) {
-        print('發生錯誤: $e');
+        print('[generateSpecificUserPost]發生錯誤: $e');
         return [];
       }
     }
@@ -327,7 +327,7 @@ class _PostState extends State<Post> {
           specific_user: query.specificUser,
         );
       } catch (e) {
-        print('發生錯誤: $e');
+        print('[generatePost]發生錯誤: $e');
         return [];
       }
     }

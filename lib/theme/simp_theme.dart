@@ -13,7 +13,7 @@ class MaterialTheme {
       onPrimary: Color(0xffffffff),
       primaryContainer: Color(0xffffd9dc),
       onPrimaryContainer: Color(0xff72333c),
-      secondary: Color.fromARGB(255, 144, 88, 95),
+      secondary: Color(0xff90585f),
       onSecondary: Color(0xffffffff),
       secondaryContainer: Color(0xffffd9dc),
       onSecondaryContainer: Color(0xff72333c),
@@ -344,7 +344,7 @@ class MaterialTheme {
        bodyColor: colorScheme.onSurface,
        displayColor: colorScheme.onSurface,
      ),
-     scaffoldBackgroundColor: colorScheme.background,
+     scaffoldBackgroundColor: colorScheme.surface,
      canvasColor: colorScheme.surface,
   );
 

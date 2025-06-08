@@ -269,11 +269,13 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                             },
                                             decoration: const InputDecoration(
                                               hintText: '請輸入UserID',
-                                              border: OutlineInputBorder(),
+                                              border: OutlineInputBorder(
+                                                borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                                              ),
                                               isDense: true,
                                               contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
                                             ),
-                                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
                                           ),
                                         ),
                                       ],
@@ -283,7 +285,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                               : Center(
                                   child: Text(
                                     toneOptions[currentPage].name,
-                                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
                                   ),
                                 ),
                           ),
@@ -296,15 +298,15 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                   flex: 3,
                   child: Container(
                     width: double.infinity,
-                    color: Colors.white.withOpacity(0.6),
+                    color: Colors.white,
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                     child: Text(
                       toneOptions[currentPage]
                         .description
                         .substring(0, _textAnimation.value),
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontSize: 28,
+                        color: Theme.of(context).colorScheme.primary.withAlpha(200),
+                        fontSize: 22,
                       ),
                     ),
                   ),

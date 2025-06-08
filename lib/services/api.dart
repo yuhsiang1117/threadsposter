@@ -60,6 +60,7 @@ Future<List<GeneratedPost>> generatePost({
     httpClient.close();
   }
   if (json['success'] == true) {
+    debugPrint('/generate 回傳內容: ${json}');
     List<dynamic> rawPosts = json['post'];
     return rawPosts
         .map((rp) => GeneratedPost.fromList((rp) as List<dynamic>))
@@ -83,7 +84,7 @@ Future<List<GeneratedPost>> generateSpecificUserPost({
   http.Client? client,
 }) async {
   final httpClient = client ?? http.Client();
-  final url = Uri.parse('${getApiBaseUrl()}/generate'); // FastAPI API
+  final url = Uri.parse('${getApiBaseUrl()}/generate_specific_user'); // FastAPI API
   final response = await httpClient.post(
     url,
     headers: {'Content-Type': 'application/json'},
@@ -106,6 +107,7 @@ Future<List<GeneratedPost>> generateSpecificUserPost({
     httpClient.close();
   }
   if (json['success'] == true) {
+    debugPrint('/generate_specific_user 回傳內容: ${json}');
     List<dynamic> rawPosts = json['post'];
     return rawPosts
         .map((rp) => GeneratedPost.fromList((rp) as List<dynamic>))

@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -222,7 +224,7 @@ Future<String?> _showPasswordDialog() async {
         foregroundColor: theme.colorScheme.onPrimary,
         elevation: 2,
       ),
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
@@ -300,7 +302,6 @@ Future<String?> _showPasswordDialog() async {
                                 final navigationService = Provider.of<NavigationService>(context, listen: false);
                                 navigationService.goHome();
                               },
-                              child: Text('登入', style: TextStyle(fontSize: 18)),
                               style: ElevatedButton.styleFrom(
                                 padding: EdgeInsets.symmetric(vertical: 14),
                                 backgroundColor: theme.colorScheme.primary,
@@ -310,6 +311,7 @@ Future<String?> _showPasswordDialog() async {
                                 ),
                                 elevation: 2,
                               ),
+                              child: Text('登入', style: TextStyle(fontSize: 18)),
                             ),
                           ),
                           const SizedBox(height: 12),
@@ -321,7 +323,6 @@ Future<String?> _showPasswordDialog() async {
                                 final navigationService = Provider.of<NavigationService>(context, listen: false);
                                 navigationService.goHome();
                               },
-                              child: Text('註冊新帳號', style: TextStyle(fontSize: 18)),
                               style: OutlinedButton.styleFrom(
                                 padding: EdgeInsets.symmetric(vertical: 14),
                                 foregroundColor: theme.colorScheme.primary,
@@ -330,6 +331,7 @@ Future<String?> _showPasswordDialog() async {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
+                              child: Text('註冊新帳號', style: TextStyle(fontSize: 18)),
                             ),
                           ),
                           const SizedBox(height: 18),

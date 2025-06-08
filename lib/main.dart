@@ -7,8 +7,10 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'package:threadsposter/theme/simp_theme.dart' as simp_theme;
 import 'package:threadsposter/theme/none_theme.dart' as none_theme;
+import 'package:threadsposter/theme/boss_theme.dart' as boss_theme;
+import 'package:threadsposter/theme/simp_theme.dart' as simp_theme;
+import 'package:threadsposter/theme/custom_theme.dart' as custom_theme;
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -93,16 +95,10 @@ class App extends StatelessWidget {
               theme = simp_theme.MaterialTheme(ThemeData.light().textTheme).light();
               break;
             case 'boss':
-              theme = ThemeData(
-                colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
-                useMaterial3: true,
-              );
+              theme = boss_theme.MaterialTheme(ThemeData.light().textTheme).light();
               break;
             case 'custom':
-              theme = ThemeData(
-                colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
-                useMaterial3: true,
-              );
+              theme = custom_theme.MaterialTheme(ThemeData.light().textTheme).light();
               break;
             case 'none':
               theme = none_theme.MaterialTheme(ThemeData.light().textTheme).light();

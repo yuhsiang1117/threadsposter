@@ -107,7 +107,7 @@ class _SavedPostState extends State<SavedPost> {
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
         elevation: 2,
       ),
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: Column(
         children: [
           Padding(
@@ -146,7 +146,7 @@ class _SavedPostState extends State<SavedPost> {
                       children: [
                         Icon(Icons.bookmark_border, size: 80, color: Theme.of(context).colorScheme.primary.withOpacity(0.2)),
                         const SizedBox(height: 16),
-                        Text('尚無收藏貼文', style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Theme.of(context).colorScheme.onBackground.withOpacity(0.6))),
+                        Text('尚無收藏貼文', style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6))),
                       ],
                     ),
                   )
@@ -228,13 +228,13 @@ class _SavedPostState extends State<SavedPost> {
                                 Container(
                                   width: double.infinity,
                                   decoration: BoxDecoration(
-                                    color: Theme.of(context).colorScheme.background,
+                                    color: Theme.of(context).colorScheme.surface,
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   padding: const EdgeInsets.all(14),
                                   child: Text(
                                     article['content'] ?? '',
-                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onBackground),
+                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurface),
                                     softWrap: true,
                                     overflow: TextOverflow.visible,
                                   ),
