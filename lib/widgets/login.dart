@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:threadsposter/services/UserData_provider.dart';
 import 'package:threadsposter/services/navigation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -23,6 +24,7 @@ class _LoginPageState extends State<LoginPage> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+      debugPrint('login email is ${_emailController.text.trim()}');
       print('✅ Email 登入成功');
       
     } on FirebaseAuthException catch (e) {
@@ -287,6 +289,10 @@ Future<String?> _showPasswordDialog() async {
                             child: ElevatedButton(
                               onPressed: () async {
                                 await _signInWithEmail();
+                                if (context.mounted) {
+                                  context.read<UserDataProvider>().refreshData();
+                                }
+                                debugPrint('[login.dart] 登入成功，刷新使用者資料');
                                 final navigationService = Provider.of<NavigationService>(context, listen: false);
                                 navigationService.goHome();
                               },
@@ -354,6 +360,9 @@ Future<String?> _showPasswordDialog() async {
                               ),
                               onPressed: () async {
                                 await _signInWithGoogle();
+                                if (context.mounted) {
+                                  context.read<UserDataProvider>().refreshData();
+                                }
                                 final navigationService = Provider.of<NavigationService>(context, listen: false);
                                 navigationService.goHome();
                               },

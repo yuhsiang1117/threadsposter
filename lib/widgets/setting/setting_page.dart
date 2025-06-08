@@ -3,9 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:threadsposter/services/navigation.dart';
 import 'package:threadsposter/services/UserData_provider.dart';
-import 'package:threadsposter/widgets/setting/history_page.dart';
-import 'package:threadsposter/widgets/setting/notification_page.dart';
-import 'package:threadsposter/widgets/setting/api_test_page.dart';
+import 'package:threadsposter/widgets/home/home_page.dart';
 import 'edit_profile.dart';
 
 class Setting extends StatefulWidget {
@@ -173,6 +171,7 @@ class Setting extends StatefulWidget {
                         onPressed: () async {
                           await FirebaseAuth.instance.signOut();
                           Navigator.of(context).pop(); // 關閉視窗
+                          isUserExist = false; // 更新登出狀態
                           final navigationService = Provider.of<NavigationService>(context, listen: false);
                           navigationService.goHome();
                           // 可選：登出後跳轉頁面

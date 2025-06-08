@@ -59,6 +59,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     carouselController = InfiniteScrollController(initialItem: currentPage);
     uid = context.read<UserDataProvider>().uid;
     if (!isUserExist){
+      print("uid is $uid\n\n");
       _future = checkUserDocumentExists(uid);
     }
     else {
