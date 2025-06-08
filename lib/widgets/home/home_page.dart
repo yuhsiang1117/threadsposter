@@ -235,7 +235,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                     opacity: opacity,
                                     child: SizedBox(
                                       width: itemWidth,
-                                      child: Dailypop(
+                                      child: CharacterCard(
                                         screenWidth: screenWidth,
                                         index: itemIndex,
                                       ),
@@ -325,7 +325,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                             foreground: Paint()
                               ..style = PaintingStyle.stroke
                               ..strokeWidth = 2
-                              ..color = Colors.white,
+                              ..color = Theme.of(context).colorScheme.primary.withAlpha(200)
                           ),
                         ),
                         Text(
@@ -333,7 +333,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.primary.withAlpha(200),
+                            color: Colors.white,
                           ),
                         ),
                       ]

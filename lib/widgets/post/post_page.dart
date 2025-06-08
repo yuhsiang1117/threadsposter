@@ -246,7 +246,7 @@ class _PostState extends State<Post> {
               setState(() {
                 _errorMessage = '';
               });
-              navigationService.goPostResult(result);
+              navigationService.goPostResult(result, postQuery.userQuery, postQuery.style);
             });
           },
           style: ElevatedButton.styleFrom(

@@ -39,6 +39,32 @@ final routerConfig = GoRouter(
       pageBuilder: (context, state) => const NoTransitionPage<void>(
         child: Setting()
       ),
+      routes: <RouteBase>[
+        GoRoute(
+          path: 'favorites',
+          pageBuilder: (context, state) => const NoTransitionPage<void>(
+            child: SavedPostPage()
+          ),
+        ),
+        GoRoute(
+          path: 'history',
+          pageBuilder: (context, state) => const NoTransitionPage<void>(
+            child: HistoryPage()
+          ),
+        ),
+        GoRoute(
+          path: 'notification',
+          pageBuilder: (context, state) => const NoTransitionPage<void>(
+            child: NotificationPage()
+          ),
+        ),
+        GoRoute(
+          path: 'API_test',
+          pageBuilder: (context, state) => const NoTransitionPage<void>(
+            child: ApiTestPage()
+          ),
+        )
+      ]
     ),
   ],
   redirect: (context, state) {
@@ -85,9 +111,27 @@ class NavigationService {
     routerConfig.go('/setting');
   }
 
-  void goPostResult(List<GeneratedPost> postResult) {
+  void goPostResult(List<GeneratedPost> postResult, String title, String style) {
     routerConfig.go('/post/result');
     currentResult = postResult;
+    currentTitle = title;
+    currentStyle = style;
+  }
+
+  void goSavedPosts() {
+    routerConfig.go('/setting/favorites');
+  }
+
+  void goHistory() {
+    routerConfig.go('/setting/history');
+  }
+
+  void goNotification() {
+    routerConfig.go('/setting/notification');
+  }
+
+  void goApiTest() {
+    routerConfig.go('/setting/API_test');
   }
   // To work with the web browser history, do not use Navigator.push() or pop() directly
   // void pushFiltersOnHome({required BuildContext context}) {

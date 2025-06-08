@@ -4,8 +4,8 @@ import 'package:threadsposter/services/navigation.dart';
 import 'package:threadsposter/models/data_lists.dart';
 import 'package:threadsposter/widgets/home/home_page.dart';
 
-class Dailypop extends StatelessWidget {
-  const Dailypop({
+class CharacterCard extends StatelessWidget {
+  const CharacterCard({
     super.key,
     required this.screenWidth,
     required this.index,

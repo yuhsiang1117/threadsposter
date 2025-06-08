@@ -3,10 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:threadsposter/services/navigation.dart';
 import 'package:threadsposter/services/UserData_provider.dart';
-import 'package:threadsposter/widgets/setting/history.dart';
-import 'package:threadsposter/widgets/setting/notification.dart';
-import 'package:threadsposter/widgets/setting/api_test_widget.dart';
-import 'package:threadsposter/widgets/setting/savedposts.dart';
+import 'package:threadsposter/widgets/setting/history_page.dart';
+import 'package:threadsposter/widgets/setting/notification_page.dart';
+import 'package:threadsposter/widgets/setting/api_test_page.dart';
 import 'edit_profile.dart';
 
 class Setting extends StatefulWidget {
@@ -112,6 +111,7 @@ class Setting extends StatefulWidget {
     }
 
     Widget _buildMenuSection(BuildContext context) {
+      final navigationService = Provider.of<NavigationService>(context, listen: false);
       return Card(
         elevation: 2,
         child: Column(
@@ -120,10 +120,7 @@ class Setting extends StatefulWidget {
               icon: Icons.favorite,
               title: '我的收藏',
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const SavedPost()),
-                );
+                navigationService.goSavedPosts();
               },
             ),
             _buildDivider(),
@@ -131,10 +128,7 @@ class Setting extends StatefulWidget {
               icon: Icons.history,
               title: '歷史紀錄',
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HistoryPage()),
-                );
+                navigationService.goHistory();
               },
             ),
             _buildDivider(),
@@ -142,10 +136,7 @@ class Setting extends StatefulWidget {
               icon: Icons.notifications,
               title: '通知設定',
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const NotificationPage()),
-                );
+                navigationService.goNotification();
               },
             ),
             _buildDivider(),
@@ -153,10 +144,7 @@ class Setting extends StatefulWidget {
               icon: Icons.api,
               title: 'API 測試工具',
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ApiTestWidget()),
-                );
+                navigationService.goApiTest();
               },
             ),
             _buildDivider(),

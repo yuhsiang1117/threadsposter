@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:threadsposter/services/api.dart';
+import 'package:threadsposter/services/UserData_provider.dart';
+import 'package:threadsposter/models/save_post.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 List<GeneratedPost> currentResult = [];
+String currentTitle = '';
+String currentStyle = '';
 
 class PostResult extends StatefulWidget {
   const PostResult({super.key});
@@ -29,6 +35,48 @@ class _PostResultState extends State<PostResult> {
       controller.dispose();
     }
     super.dispose();
+  }
+
+  void addFavoriteDB(String uid, SavedPost content) async {
+    final userDoc = FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('profile')
+        .doc('info');
+    final docSnapshot = await userDoc.get();
+    int nextPostID = docSnapshot.data()?['nextPostID'] ?? 0;
+
+    final docRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('favorites')
+        .doc(); // 使用自動生成的文檔 ID
+    
+    await userDoc.update({'nextPostID': nextPostID + 1});
+
+    await docRef.set({
+      'ID' : nextPostID,
+      'title': content.title,
+      'content': content.content,
+      'style': content.style,
+      'savedAt': FieldValue.serverTimestamp(), // 添加時間戳
+    });
+  }
+
+  void removeFavoriteDB(String uid, SavedPost content) async {
+
+    final query = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('favorites')
+        .where('title', isEqualTo: content.title)
+        .where('content', isEqualTo: content.content)
+        .where('style', isEqualTo: content.style)
+        .get();
+
+    for (var doc in query.docs) {
+      await doc.reference.delete();
+    }
   }
 
   @override
@@ -106,15 +154,34 @@ class _PostResultState extends State<PostResult> {
                           icon: Icon(_isFavorited[i] ? Icons.favorite : Icons.favorite_border),
                           color: _isFavorited[i] ? Colors.red : colorScheme.primary,
                           tooltip: '收藏',
-                          onPressed: () {
+                          onPressed: () async {
                             setState(() {
                               _isFavorited[i] = !_isFavorited[i];
                             });
+                            final uid = Provider.of<UserDataProvider>(context, listen: false).uid;
                             if (_isFavorited[i]) {
+                              // 將當前結果加入收藏
+                              addFavoriteDB(
+                                uid!,
+                                SavedPost(
+                                  title: currentTitle,
+                                  content: currentResult[i].content,
+                                  style: currentStyle,
+                                )
+                              );
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(content: Text('已加入收藏')),
                               );
                             } else {
+                              // 從收藏中移除
+                              removeFavoriteDB(
+                                uid!,
+                                SavedPost(
+                                  title: currentTitle,
+                                  content: currentResult[i].content,
+                                  style: currentStyle,
+                                )
+                              );
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(content: Text('已取消收藏')),
                               );

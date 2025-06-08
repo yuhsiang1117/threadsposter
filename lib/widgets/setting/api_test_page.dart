@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:threadsposter/services/api.dart';
 
-class ApiTestWidget extends StatefulWidget {
-  const ApiTestWidget({super.key});
+class ApiTestPage extends StatefulWidget {
+  const ApiTestPage({super.key});
 
   @override
-  State<ApiTestWidget> createState() => _ApiTestWidgetState();
+  State<ApiTestPage> createState() => _ApiTestPageState();
 }
 
-class _ApiTestWidgetState extends State<ApiTestWidget> {
+class _ApiTestPageState extends State<ApiTestPage> {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
   String _errorMessage = '';

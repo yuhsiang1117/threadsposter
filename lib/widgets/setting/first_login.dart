@@ -40,9 +40,10 @@ class _FirstLoginPageState extends State<FirstLoginPage> {
     final fcmToken = await FirebaseMessaging.instance.getToken();
     print(fcmToken);
     FirebaseFirestore.instance.collection("users").doc(uid).collection("profile").doc("info").set({
-      'name':name,
-      'email':email,
-      'token':fcmToken,
+      'name': name,
+      'email': email,
+      'nextPostID': 0,
+      'token': fcmToken,
     }, SetOptions(merge: true));
     if (context.mounted) {
       context.read<UserDataProvider>().refreshData();

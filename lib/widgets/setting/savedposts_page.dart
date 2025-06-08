@@ -1,81 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:threadsposter/models/save_post.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:threadsposter/services/UserData_provider.dart';
 
-class SavedPost extends StatefulWidget {
-  const SavedPost({super.key});
+class SavedPostPage extends StatefulWidget {
+  const SavedPostPage({super.key});
 
   @override
-  State<SavedPost> createState() => _SavedPostState();
+  State<SavedPostPage> createState() => _SavedPostPageState();
 }
 
-class _SavedPostState extends State<SavedPost> {
-  List<Map<String, String>> savedArticles = [
-    {
-      'title': '啊啊啊地震',
-      'content': '剛剛地震超大，大家還好嗎？',
-      'style': 'Emotion',
-    },
-    {
-      'title': '測試',
-      'content': '測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試測試',
-      'style': 'Practical',
-    },
-    {
-      'title': '測試2',
-      'content': '測試2',
-      'style': 'Identity',
-    },
-    {
-      'title': '測試3',
-      'content': '測試3',
-      'style': 'Emotion',
-    },
-    {
-      'title': '測試4',
-      'content': '測試4',
-      'style': 'Trend',
-    },
-    {
-      'title': '測試5',
-      'content': '測試5',
-      'style': 'Practical',
-    },
-    {
-      'title': '測試6',
-      'content': '測試6',
-      'style': 'Identity',
-    },
-    {
-      'title': '測試7',
-      'content': '測試7',
-      'style': 'Emotion',
-    },
-    {
-      'title': '測試8',
-      'content': '測試8',
-      'style': 'Trend',
-    },
-    {
-      'title': '測試9',
-      'content': '測試9',
-      'style': 'Practical',
-    },
-    {
-      'title': '測試10',
-      'content': '測試10',
-      'style': 'Identity',
-    },
-    {
-      'title': '測試11',
-      'content': '測試11',
-      'style': 'Emotion',
-    },
-    {
-      'title': '測試12',
-      'content': '測試12',
-      'style': 'Trend',
-    },
-  ];
+class _SavedPostPageState extends State<SavedPostPage> {
+  List<SavedPost> savedArticles = [];
+  void loadFavorites(String uid) async {
+
+    final query = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('favorites')
+        .get();
+
+    setState(() {
+      debugPrint('[SavedPostPage] Loaded ${query.docs.length} saved articles for user $uid');
+      savedArticles.clear();
+      for (var doc in query.docs) {
+        final data = doc.data();
+        savedArticles.add(SavedPost(
+          title: data['title'],
+          content: data['content'],
+          style: data['style'],
+        ));
+      }
+    });
+  }
+
+  void removeFavoriteDB(String uid, SavedPost content) async {
+
+    final query = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('favorites')
+        .where('title', isEqualTo: content.title)
+        .where('content', isEqualTo: content.content)
+        .where('style', isEqualTo: content.style)
+        .get();
+
+    for (var doc in query.docs) {
+      await doc.reference.delete();
+    }
+  }
 
   final List<String> styleOptions = const [
     '全部',
@@ -88,10 +63,17 @@ class _SavedPostState extends State<SavedPost> {
   String selectedStyle = '全部';
 
   @override
+  void initState() {
+    super.initState();
+    final uid = Provider.of<UserDataProvider>(context, listen: false).uid;
+    loadFavorites(uid!);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final filteredArticles = selectedStyle == '全部'
         ? savedArticles
-        : savedArticles.where((a) => a['style'] == selectedStyle).toList();
+        : savedArticles.where((a) => a.style == selectedStyle).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -163,7 +145,7 @@ class _SavedPostState extends State<SavedPost> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                         child: InkWell(
                           onLongPress: () {
-                            final content = article['content'] ?? '';
+                            final content = article.content ?? '';
                             Clipboard.setData(ClipboardData(text: content));
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('已複製到剪貼簿')),
@@ -183,16 +165,16 @@ class _SavedPostState extends State<SavedPost> {
                                         children: [
                                           Expanded(
                                             child: Text(
-                                              article['title'] ?? '',
+                                              article.title ?? '',
                                               style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
                                             ),
                                           ),
-                                          if (article['style'] != null)
+                                          if (article.style != null)
                                             Padding(
                                               padding: const EdgeInsets.only(left: 8),
                                               child: Chip(
-                                                label: Text(article['style']!, style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onPrimary)),
-                                                backgroundColor: _chipColor(article['style']),
+                                                label: Text(article.style!, style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onPrimary)),
+                                                backgroundColor: _chipColor(article.style),
                                                 labelStyle: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onPrimary),
                                                 padding: const EdgeInsets.symmetric(horizontal: 8),
                                               ),
@@ -205,6 +187,10 @@ class _SavedPostState extends State<SavedPost> {
                                       onSelected: (value) {
                                         if (value == 'delete') {
                                           setState(() {
+                                            removeFavoriteDB(
+                                              Provider.of<UserDataProvider>(context, listen: false).uid!,
+                                              savedArticles[realIndex],
+                                            );
                                             savedArticles.removeAt(realIndex);
                                           });
                                         }
@@ -233,7 +219,7 @@ class _SavedPostState extends State<SavedPost> {
                                   ),
                                   padding: const EdgeInsets.all(14),
                                   child: Text(
-                                    article['content'] ?? '',
+                                    article.content ?? '',
                                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurface),
                                     softWrap: true,
                                     overflow: TextOverflow.visible,
