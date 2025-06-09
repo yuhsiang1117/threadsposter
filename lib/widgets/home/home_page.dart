@@ -80,6 +80,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    _textController.dispose();
     _customToneController.dispose();
     super.dispose();
   }
