@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 class CountSlider extends StatefulWidget {
 
+  final int selectedCount;
   final void Function(int)? onCountSelected;
-  const CountSlider({super.key, this.onCountSelected});
+  const CountSlider({super.key, this.onCountSelected, required this.selectedCount});
 
   @override
   State<CountSlider> createState() => _CountSliderState();
@@ -16,7 +17,7 @@ class _CountSliderState extends State<CountSlider> {
   @override
   void initState() {
     super.initState();
-    selectedCounts = 3; // 預設值為 3 天
+    selectedCounts = widget.selectedCount; // 預設值為 3 天
   }
 
   void _onSizeChanged(int count) {

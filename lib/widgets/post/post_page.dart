@@ -190,6 +190,7 @@ class _PostState extends State<Post> {
                   children: [
                     SizedBox(height: 10),
                     DaysSlider(
+                      selectedDays: _selectedDays,
                       onDaysSelected: (days) {
                         setState(() {
                           _selectedDays = days;
@@ -198,6 +199,7 @@ class _PostState extends State<Post> {
                     ),
                     const SizedBox(height: 10),
                     LikesSlider(
+                      selectedLikes: _selectedLikes,
                       onLikesSelected: (likes) {
                         setState(() {
                           _selectedLikes = likes;
@@ -206,6 +208,7 @@ class _PostState extends State<Post> {
                     ),
                     const SizedBox(height: 10),
                     CountSlider(
+                      selectedCount: _selectedCount,
                       onCountSelected: (count) {
                         setState(() {
                           _selectedCount = count;

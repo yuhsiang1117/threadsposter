@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 class DaysSlider extends StatefulWidget {
 
+  final int selectedDays;
   final void Function(int)? onDaysSelected;
-  const DaysSlider({super.key, this.onDaysSelected});
+  const DaysSlider({super.key, this.onDaysSelected, required this.selectedDays});
 
   @override
   State<DaysSlider> createState() => _DaysSliderState();
@@ -16,10 +17,10 @@ class _DaysSliderState extends State<DaysSlider> {
   @override
   void initState() {
     super.initState();
-    selectedDays = 15;
+    selectedDays = widget.selectedDays;
   }
 
-  void _onSizeChanged(int days) {
+  void _onDayChanged(int days) {
     setState(() {
       selectedDays = days;
     });
@@ -80,7 +81,7 @@ class _DaysSliderState extends State<DaysSlider> {
             divisions: 29,
             label: '${selectedDays ?? 1} 天',
             onChanged: (double value) {
-              _onSizeChanged(value.round());
+              _onDayChanged(value.round());
             },
           ),
           ],

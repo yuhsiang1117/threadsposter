@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 class LikesSlider extends StatefulWidget {
 
+  final int selectedLikes;
   final void Function(int)? onLikesSelected;
-  const LikesSlider({super.key, this.onLikesSelected});
+  const LikesSlider({super.key, this.onLikesSelected, required this.selectedLikes});
 
   @override
   State<LikesSlider> createState() => _LikesSliderState();
@@ -16,16 +17,16 @@ class _LikesSliderState extends State<LikesSlider> {
   @override
   void initState() {
     super.initState();
-    selectedLikes = 1000;
+    selectedLikes = widget.selectedLikes;
   }
 
-  void _onSizeChanged(int days) {
+  void _onLikesChanged(int likes) {
     setState(() {
-      selectedLikes = days;
+      selectedLikes = likes;
     });
 
     if (widget.onLikesSelected != null) {
-      widget.onLikesSelected!(days); // 傳出去
+      widget.onLikesSelected!(likes); // 傳出去
     }
   }
 
@@ -80,7 +81,7 @@ class _LikesSliderState extends State<LikesSlider> {
             divisions: 4000,
             label: '${selectedLikes ?? 1000} 讚',
             onChanged: (double value) {
-              _onSizeChanged(value.round());
+              _onLikesChanged(value.round());
             },
           ),
           ],
