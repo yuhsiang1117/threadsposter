@@ -166,9 +166,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
         }
         else {
           newweight = {
-            'relevance': 0.5,
+            'relevance': 0.6,
             'traffic': 0.3,
-            'recency': 0.2,
+            'recency': 0.1,
           };
         }
         if (context.mounted) {
