@@ -30,6 +30,17 @@ class _PostResultState extends State<PostResult> {
   List<TextEditingController> _editControllers = [];
 
   @override
+  void initState() {
+    super.initState();
+    for (GeneratedPost post in currentResult) {
+      String article = post.content
+        .replaceAll(r'\\', '')      // 先去掉多餘的反斜線
+        .replaceAll(r'\n', '\n');
+      post.content = article;
+    }
+  }
+
+  @override
   void dispose() {
     _generatedTextController.dispose();
     _customTextController.dispose();
