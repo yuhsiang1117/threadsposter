@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:threadsposter/services/navigation.dart';
 import 'package:threadsposter/services/UserData_provider.dart';
 import 'package:threadsposter/widgets/home/home_page.dart';
+import 'package:threadsposter/widgets/setting/scheduled_posts_page.dart';
 import 'edit_profile.dart';
 
 class Setting extends StatefulWidget {
@@ -130,6 +131,16 @@ class Setting extends StatefulWidget {
               title: '通知設定',
               onTap: () {
                 navigationService.goNotification();
+              },
+            ),
+            _buildDivider(),
+            _buildMenuItem(
+              icon: Icons.schedule,
+              title: '已排程發文',
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const ScheduledPostsPage()),
+                );
               },
             ),
             _buildDivider(),

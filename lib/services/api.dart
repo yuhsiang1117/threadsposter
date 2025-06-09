@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class GeneratedPost {
   String content;
@@ -196,6 +198,16 @@ Future<bool> postWithSchedule({
       'minute': time.minute,
     };
     body['schedule'] = schedule; // 添加排程時間
+    // 寫入 Firestore
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await FirebaseFirestore.instance.collection('schedule').add({
+        'content': text,
+        'scheduledTime': Timestamp.fromDate(time),
+        'userId': user.uid,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    }
   }
   // print json
   debugPrint('Post body: ${jsonEncode(body)}');

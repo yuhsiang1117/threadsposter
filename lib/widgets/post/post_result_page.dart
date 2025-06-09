@@ -291,11 +291,17 @@ class _PostResultState extends State<PostResult> {
                       text: currentResult[i].content,
                       time: isSchedule == true ? scheduleTime : null,
                     );
-                    if (success) {
+                    if (success && isSchedule == false) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('發文成功')),
                       );
-                    } else {
+                    } 
+                    else if (success && isSchedule == true) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('已排程發文')),
+                      );
+                    }
+                    else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('發文失敗')),
                       );
