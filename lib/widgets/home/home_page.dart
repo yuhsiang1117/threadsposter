@@ -77,6 +77,12 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       });
       isInitialized = true;
     }
+    updateWeight();
+  }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    
   }
 
   @override
@@ -103,6 +109,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   }
   
   void showWeightChooseDialog(BuildContext context) {
+    print("更新權重");
     Map<String, double> newweight;
     final uid = Provider.of<UserDataProvider>(context, listen: false).uid;
     final userinfo = FirebaseFirestore.instance
@@ -174,8 +181,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     });
   }
 
-  void updateWeight(BuildContext context) async {
-    print("更新權重");
+  void updateWeight() async {
+    
     final uid = Provider.of<UserDataProvider>(context, listen: false).uid;
     if (uid == null) return;
 
@@ -186,7 +193,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
         .doc('info');
     final docSnapshot = await userDoc.get();
     var notlikepostnums = docSnapshot.data()?['NotLikePostNums'] ?? 0;
-    print(notlikepostnums);
+    print("article number:${notlikepostnums}");
     if (notlikepostnums >= 5) {
       showWeightChooseDialog(context);
       notlikepostnums = notlikepostnums - 5; // 超過5篇不喜歡的文章，觸發權重調整
@@ -241,7 +248,6 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     final double screenWidth = MediaQuery.of(context).size.width;
     final toneOptions = Provider.of<ToneProvider>(context).tones;
     _customToneController.text = customTone;
-    updateWeight(context);
     // 如果沒有載入語氣選項，顯示載入中指示器
     if (toneOptions.isEmpty) {
       debugPrint('[lib/widgets/home/home_page.dart] No tone options available, showing loading indicator');

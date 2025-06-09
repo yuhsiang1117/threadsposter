@@ -86,15 +86,7 @@ class _PostResultState extends State<PostResult> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final uid = Provider.of<UserDataProvider>(context, listen: false).uid;
-    final userinfo = FirebaseFirestore.instance
-          .collection("users")
-          .doc(uid)
-          .collection("profile")
-          .doc("info");
-    final notlikepostnums = context.watch<UserDataProvider>().userinfo?['NotLikePostNums'] ?? 0;
-    print(currentResult.length);
-    userinfo.update({'NotLikePostNums': notlikepostnums + currentResult.length}); // 重置不喜歡的文章數量
+    
     if (context.mounted) {
         context.read<UserDataProvider>().refreshData();
     }

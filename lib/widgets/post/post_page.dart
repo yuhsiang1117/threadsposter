@@ -307,7 +307,7 @@ class _PostState extends State<Post> {
             // ];
             //navigationService.goPostResult(testPosts);
             setWeight(weight: weight);
-            _sendPostQuery(postQuery).then((result) {
+            _sendPostQuery(postQuery).then((result) async {
               setState(() {
                 _isGenerating = false;
               });
@@ -326,6 +326,16 @@ class _PostState extends State<Post> {
               setState(() {
                 _errorMessage = '';
               });
+              final userprovider = Provider.of<UserDataProvider>(context, listen: false);
+              final uid = userprovider.uid;
+              final userinfo = FirebaseFirestore.instance
+                .collection("users")
+                .doc(uid)
+                .collection("profile")
+                .doc("info");
+              final notlikepostnums = userprovider.userinfo?['NotLikePostNums'] ?? 0;
+              print("selectedCount : ${_selectedCount}");
+              await userinfo.update({'NotLikePostNums': notlikepostnums + _selectedCount}); // 重置不喜歡的文章數量
               navigationService.goPostResult(result, postQuery.userQuery, postQuery.style);
             });
           },
