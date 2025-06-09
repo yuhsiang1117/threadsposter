@@ -186,18 +186,18 @@ Future<bool> postWithSchedule({
   DateTime? time,
   http.Client? client,
 }) async {
-  final httpClient = client ?? http.Client();
-  final url = Uri.parse('${getApiBaseUrl()}/post'); // FastAPI API
-  Map<String, dynamic> body = {'text': text};
+  // final httpClient = client ?? http.Client();
+  // final url = Uri.parse('${getApiBaseUrl()}/post'); // FastAPI API
+  // Map<String, dynamic> body = {'text': text};
   if (time != null) {
-    Map<String, dynamic> schedule = {
-      'year': time.year,
-      'month': time.month,
-      'day': time.day,
-      'hour': time.hour,
-      'minute': time.minute,
-    };
-    body['schedule'] = schedule; // 添加排程時間
+    // Map<String, dynamic> schedule = {
+    //   'year': time.year,
+    //   'month': time.month,
+    //   'day': time.day,
+    //   'hour': time.hour,
+    //   'minute': time.minute,
+    // };
+    // body['schedule'] = schedule; // 添加排程時間
     // 寫入 Firestore
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
@@ -206,24 +206,38 @@ Future<bool> postWithSchedule({
         'scheduledTime': Timestamp.fromDate(time),
         'userId': user.uid,
         'createdAt': FieldValue.serverTimestamp(),
+        'status': 'pending',
+      });
+    }
+  } else {
+    // body['schedule'] = null; // 如果沒有時間，設為 null
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await FirebaseFirestore.instance.collection('schedule').add({
+        'content': text,
+        'scheduledTime': Timestamp.now(),
+        'userId': user.uid,
+        'createdAt': FieldValue.serverTimestamp(),
+        'status': 'immediate',
       });
     }
   }
   // print json
-  debugPrint('Post body: ${jsonEncode(body)}');
-  final response = await httpClient.post(
-    url,
-    body: jsonEncode(body),
-    headers: {'Content-Type': 'application/json'},
-  );
-  final json = jsonDecode(response.body);
-  if (response.statusCode != 200) {
-    throw Exception('HTTP 錯誤：${response.statusCode}');
-  }
-  if (client == null) {
-    httpClient.close();
-  }
-  return json['success'];
+  // debugPrint('Post body: ${jsonEncode(body)}');
+  // final response = await httpClient.post(
+  //   url,
+  //   body: jsonEncode(body),
+  //   headers: {'Content-Type': 'application/json'},
+  // );
+  // final json = jsonDecode(response.body);
+  // if (response.statusCode != 200) {
+  //   throw Exception('HTTP 錯誤：${response.statusCode}');
+  // }
+  // if (client == null) {
+  //   httpClient.close();
+  // }
+  // return json['success'];
+  return true;
 }
 
 // 取得可用角色
