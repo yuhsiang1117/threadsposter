@@ -140,6 +140,24 @@ Future<bool> changeTone({required String tone, http.Client? client}) async {
   }
   return json['success'];
 }
+Future<Map<String, double>> changeWeight({required String weight, http.Client? client}) async {
+  final httpClient = client ?? http.Client();
+  final url = Uri.parse('${getApiBaseUrl()}/change_weight'); // FastAPI API
+  final response = await httpClient.post(
+    url,
+    body: jsonEncode({"weight_type":weight}),
+    headers: {'Content-Type': 'application/json'},
+  );
+  final json = jsonDecode(response.body);
+  if (response.statusCode != 200) {
+    throw Exception('HTTP 錯誤：${response.statusCode}');
+  }
+  if (client == null) {
+    httpClient.close();
+  }
+  return json['new_weight'];
+}
+
 
 // 文章風格
 Future<List<String>> getTone({http.Client? client}) async {

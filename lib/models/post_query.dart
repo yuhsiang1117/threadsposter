@@ -1,4 +1,5 @@
 
+
 class PostQuery {
   String userQuery;
   String tag;
@@ -9,6 +10,7 @@ class PostQuery {
   int returnCount;
   String tone;
   String specificUser = '';
+  Map <String, double> weight;
 
   PostQuery({
     required this.userQuery,
@@ -19,7 +21,8 @@ class PostQuery {
     required this.gclikes,
     required this.returnCount,
     required this.tone,
-    required this.specificUser
+    required this.specificUser,
+    required this.weight,
   });
 
   @override

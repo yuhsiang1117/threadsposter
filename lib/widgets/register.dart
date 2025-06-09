@@ -32,7 +32,7 @@ class _RegisterPageState extends State<RegisterPage> {
           SnackBar(content: Text('註冊成功')),
         );
         final navigationService = Provider.of<NavigationService>(context, listen: false);
-        navigationService.goHome();
+        navigationService.goFirstLogin();
       } on FirebaseAuthException catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('註冊失敗：${e.message}')),
@@ -124,7 +124,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () async {
+                      onPressed: () {
                         _submit();
                         if (context.mounted) {
                           context.read<UserDataProvider>().refreshData();

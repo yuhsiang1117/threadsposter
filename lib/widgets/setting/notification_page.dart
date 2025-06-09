@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:threadsposter/main.dart';
+import 'package:threadsposter/widgets/widgets.dart';
 
 Future<void> _showLocalNotification() async {
   const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
@@ -34,7 +35,42 @@ class NotificationPage extends StatefulWidget {
 
 class _NotificationPageState extends State<NotificationPage> {
   bool _isOn = false;
-
+  void showWeightChooseDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('請選擇一個選項'),
+        content: const Text('你認為生成的文章需要加強哪個面向？'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop('關鍵字契合度');
+              // 可在這裡執行紅色選項的邏輯
+            },
+            child: const Text('關鍵字契合度'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop('流量');
+              // 可在這裡執行藍色選項的邏輯
+            },
+            child: const Text('流量'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop('時效性');
+              // 可在這裡執行綠色選項的邏輯
+            },
+            child: const Text('時效性'),
+          ),
+        ],
+      ),
+    ).then((selected) {
+      if (selected != null) {
+        ;
+      }
+    });
+  }
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);

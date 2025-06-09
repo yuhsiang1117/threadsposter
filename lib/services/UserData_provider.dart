@@ -7,9 +7,9 @@ class UserDataProvider extends ChangeNotifier {
   String? uid;
   Map<String, dynamic>? userinfo;
   final List<PostQuery> _queries = [
-    PostQuery(userQuery: 'userQuery', tag: 'tag', style: 'style', withInDays: 10, size: 10, gclikes: 10, returnCount: 10, tone: 'tone', specificUser: 'null'),
-    PostQuery(userQuery: 'userQuery', tag: 'tag', style: 'style', withInDays: 10, size: 10, gclikes: 10, returnCount: 10, tone: 'tone', specificUser: 'null'),
-    PostQuery(userQuery: 'userQuery', tag: 'tag', style: 'style', withInDays: 10, size: 10, gclikes: 10, returnCount: 10, tone: 'tone', specificUser: 'null')
+    PostQuery(userQuery: 'userQuery', tag: 'tag', style: 'style', withInDays: 10, size: 10, gclikes: 10, returnCount: 10, tone: 'tone', specificUser: 'null', weight: {'relevance': 0.5714, 'traffic': 0.3333, 'recency': 0.09523}),
+    PostQuery(userQuery: 'userQuery', tag: 'tag', style: 'style', withInDays: 10, size: 10, gclikes: 10, returnCount: 10, tone: 'tone', specificUser: 'null', weight: {'relevance': 0.5714, 'traffic': 0.3333, 'recency': 0.09523}),
+    PostQuery(userQuery: 'userQuery', tag: 'tag', style: 'style', withInDays: 10, size: 10, gclikes: 10, returnCount: 10, tone: 'tone', specificUser: 'null', weight: {'relevance': 0.5714, 'traffic': 0.3333, 'recency': 0.09523}),
   ];
 
   List<PostQuery> get queries => _queries;

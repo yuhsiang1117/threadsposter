@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:threadsposter/services/UserData_provider.dart';
 import 'package:threadsposter/services/navigation.dart';
+import 'package:threadsposter/widgets/setting/loading_animation.dart';
 
 class FirstLoginPage extends StatefulWidget {
   const FirstLoginPage({super.key});
@@ -33,24 +34,51 @@ class _FirstLoginPageState extends State<FirstLoginPage> {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     final name = _nameController.text.trim();
     final email = FirebaseAuth.instance.currentUser?.email;
-    print(uid);
-    print(name);
-    print(email);
-    final fcmToken = await FirebaseMessaging.instance.getToken();
-    print(fcmToken);
-    FirebaseFirestore.instance.collection("users").doc(uid).collection("profile").doc("info").set({
-      'name': name,
-      'email': email,
-      'nextPostID': 0,
-      'token': fcmToken,
-    }, SetOptions(merge: true));
-    if (context.mounted) {
-      context.read<UserDataProvider>().refreshData();
+    print("UID: $uid, Name: $name, Email: $email");
+    // 顯示 loading dialog
+    print("正在儲存資料...");
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const SavingDialog(),
+    );
+
+    try {
+      final fcmToken = await FirebaseMessaging.instance.getToken();
+      print("FCM Token: $fcmToken");
+
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(uid)
+          .collection("profile")
+          .doc("info")
+          .set({
+        'name': name,
+        'email': email,
+        'nextPostID': 0,
+        'token': fcmToken,
+        'weight': {
+          'relevance': 0.5,
+          'traffic': 0.3,
+          'recency': 0.2,
+        },
+        'NotLikePostNums': 0,
+      }, SetOptions(merge: true));
+
+      if (context.mounted) {
+        context.read<UserDataProvider>().refreshData();
+      }
+    } catch (e) {
+      print('🔥 發生錯誤: $e');
+    } finally {
+      if (context.mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+      }
+      final navigationService = Provider.of<NavigationService>(context, listen: false);
+      navigationService.goHome();
     }
-    else {
-      debugPrint('Context is not mounted, cannot refresh data.');
-    }  
   }
+
 
   @override
   Widget build(BuildContext context) {

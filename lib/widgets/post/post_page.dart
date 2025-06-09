@@ -34,6 +34,11 @@ class _PostState extends State<Post> {
   int _selectedLikes = 1000;
   int _selectedCount = 3;
   String _errorMessage = '';
+  static Map <String, double> defaultWeight = {
+    'relevance': 0.5714,
+    'traffic': 0.3333,
+    'recency': 0.09523,
+  };  
   late ThemeData theme;
   late ColorScheme colorScheme;
 
@@ -47,6 +52,7 @@ class _PostState extends State<Post> {
     returnCount: 3,
     tone: 'none',
     specificUser: '',
+    weight: defaultWeight
   );
 
   @override
@@ -345,6 +351,7 @@ class _PostState extends State<Post> {
     postQuery.size = parseSize(_selectedSize);
     postQuery.gclikes = _selectedLikes;
     postQuery.returnCount = _selectedCount;
+    postQuery.weight = context.watch<UserDataProvider>().userinfo?['weight'] ?? defaultWeight;
     // 根據 _selectedTone (name) 找到對應的 ToneOption 並設置 tone
     final toneProvider = Provider.of<ToneProvider>(context, listen: false);
     // final toneOptions = toneProvider.tones.isNotEmpty ? toneProvider.tones : defaultToneOptions;
