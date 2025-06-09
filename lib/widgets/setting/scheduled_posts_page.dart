@@ -21,8 +21,7 @@ class ScheduledPostsPage extends StatelessWidget {
           : StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('schedule')
-                  .where('scheduledTime', isGreaterThan: Timestamp.fromDate(DateTime.now()))
-                  .orderBy('scheduledTime')
+                  .orderBy('scheduledTime', descending: true)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
@@ -34,7 +33,20 @@ class ScheduledPostsPage extends StatelessWidget {
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                   return Center(child: Text('目前沒有排程發文'));
                 }
+                for(var change in snapshot.data!.docChanges) {
+                  if (change.type == DocumentChangeType.added) {
+                    debugPrint('新增排程: ${change.doc.data()}');
+                  } else if (change.type == DocumentChangeType.modified) {
+                    debugPrint('修改排程: ${change.doc.data()}');
+                  } else if (change.type == DocumentChangeType.removed) {
+                    debugPrint('刪除排程: ${change.doc.data()}');
+                  }
+                }
                 final posts = snapshot.data!.docs;
+                for (final post in posts) {
+                  final data = post.data() as Map<String, dynamic>;
+                  debugPrint(data.toString());
+                }
                 final pendingPosts = posts.where((post) {
                   final data = post.data() as Map<String, dynamic>;
                   return (data['status'] ?? 'pending') == 'pending';
@@ -140,7 +152,26 @@ class ScheduledPostsPage extends StatelessWidget {
                           icon: Icon(Icons.cancel, color: Theme.of(context).colorScheme.error),
                           tooltip: '取消排程',
                           onPressed: () async {
-                            await post.reference.delete();
+                            final confirm = await showDialog<bool>(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('確認取消排程'),
+                                content: const Text('確定要取消這則排程發文嗎？此動作無法復原。'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context, false),
+                                    child: const Text('取消'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context, true),
+                                    child: const Text('確定'),
+                                  ),
+                                ],
+                              ),
+                            );
+                            if (confirm == true) {
+                              await post.reference.delete();
+                            }
                           },
                         ),
                       if (isExpired)
@@ -180,16 +211,18 @@ class ScheduledPostsPage extends StatelessWidget {
 
   Future<DateTime?> showDateTimePicker(BuildContext context, DateTime? initialTime) async {
     final now = DateTime.now();
+    final firstDate = now;
+    final initial = (initialTime != null && initialTime.isAfter(firstDate)) ? initialTime : firstDate;
     final date = await showDatePicker(
       context: context,
-      initialDate: initialTime ?? now,
-      firstDate: now,
+      initialDate: initial,
+      firstDate: firstDate,
       lastDate: DateTime(now.year + 2),
     );
     if (date == null) return null;
     final time = await showTimePicker(
       context: context,
-      initialTime: initialTime != null
+      initialTime: initialTime != null && initialTime.isAfter(firstDate)
           ? TimeOfDay(hour: initialTime.hour, minute: initialTime.minute)
           : TimeOfDay.now(),
     );
