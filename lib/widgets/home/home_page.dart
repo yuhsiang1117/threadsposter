@@ -196,7 +196,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     print("article number:${notlikepostnums}");
     if (notlikepostnums >= 5) {
       showWeightChooseDialog(context);
-      notlikepostnums = notlikepostnums - 5; // 超過5篇不喜歡的文章，觸發權重調整
+      notlikepostnums = 0; // 超過5篇不喜歡的文章，觸發權重調整
     }
 
     await userDoc.update({'NotLikePostNums': notlikepostnums});
