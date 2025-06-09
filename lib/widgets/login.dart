@@ -372,7 +372,7 @@ class _LoginPageState extends State<LoginPage> {
                             width: double.infinity,
                             child: ElevatedButton.icon(
                               icon: Image.asset(
-                                'assets/google_logo.png',
+                                'assets/images/google_logo.png',
                                 height: 24,
                                 width: 24,
                                 errorBuilder: (_, __, ___) => const Icon(Icons.login, color: Colors.red),

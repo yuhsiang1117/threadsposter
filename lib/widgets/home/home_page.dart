@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:threadsposter/services/api.dart';
 import 'package:threadsposter/widgets/widgets.dart';
 import 'package:threadsposter/services/navigation.dart';
 import 'package:threadsposter/services/UserData_provider.dart';
@@ -100,6 +101,103 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       _future = checkUserDocumentExists(uid);
     });
   }
+  
+  void showWeightChooseDialog(BuildContext context) {
+    Map<String, double> newweight;
+    final uid = Provider.of<UserDataProvider>(context, listen: false).uid;
+    final userinfo = FirebaseFirestore.instance
+          .collection("users")
+          .doc(uid)
+          .collection("profile")
+          .doc("info");
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('請選擇一個選項'),
+        content: const Text('你希望生成的文章哪個面向較為重要？'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop('關鍵字相關性');
+              // 可在這裡執行紅色選項的邏輯
+            },
+            child: const Text('關鍵字相關性'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop('流量');
+              // 可在這裡執行藍色選項的邏輯
+            },
+            child: const Text('流量'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop('時效性');
+              // 可在這裡執行綠色選項的邏輯
+            },
+            child: const Text('時效性'),
+          ),
+        ],
+      ),
+    ).then((selected) async {
+      if (selected != null) {
+        if (selected == '關鍵字相關性') {
+          await changeWeight(weight: 'relevance');
+          final updatedweight = await getWeight();
+          print(updatedweight['relevance']);
+          await userinfo.update({'weight': updatedweight});
+        } else if (selected == '流量') {
+          await changeWeight(weight: 'traffic');
+          final updatedweight = await getWeight();
+          print(updatedweight['traffic']);
+          await userinfo.update({'weight': updatedweight});
+        } else if (selected == '時效性') {
+          await changeWeight(weight: 'recency');
+          final updatedweight = await getWeight();
+          print(updatedweight['recency']);
+          await userinfo.update({'weight': updatedweight});
+        }
+        else {
+          newweight = {
+            'relevance': 0.5,
+            'traffic': 0.3,
+            'recency': 0.2,
+          };
+        }
+        if (context.mounted) {
+          context.read<UserDataProvider>().refreshData();
+        }
+        // userinfo.update({
+        //   'weight': newweight
+        // });
+      }
+    });
+  }
+
+  void updateWeight(BuildContext context) async {
+    print("更新權重");
+    final uid = Provider.of<UserDataProvider>(context, listen: false).uid;
+    if (uid == null) return;
+
+    final userDoc = FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('profile')
+        .doc('info');
+    final docSnapshot = await userDoc.get();
+    var notlikepostnums = docSnapshot.data()?['NotLikePostNums'] ?? 0;
+    print(notlikepostnums);
+    if (notlikepostnums >= 5) {
+      showWeightChooseDialog(context);
+      notlikepostnums = notlikepostnums - 5; // 超過5篇不喜歡的文章，觸發權重調整
+    }
+
+    await userDoc.update({'NotLikePostNums': notlikepostnums});
+    if (context.mounted) {
+        context.read<UserDataProvider>().refreshData();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     uid = context.watch<UserDataProvider>().uid;
@@ -143,7 +241,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     final double screenWidth = MediaQuery.of(context).size.width;
     final toneOptions = Provider.of<ToneProvider>(context).tones;
     _customToneController.text = customTone;
-
+    updateWeight(context);
     // 如果沒有載入語氣選項，顯示載入中指示器
     if (toneOptions.isEmpty) {
       debugPrint('[lib/widgets/home/home_page.dart] No tone options available, showing loading indicator');

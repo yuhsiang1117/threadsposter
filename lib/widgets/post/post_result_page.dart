@@ -61,16 +61,7 @@ class _PostResultState extends State<PostResult> {
       'style': content.style,
       'savedAt': FieldValue.serverTimestamp(), // 添加時間戳
     });
-    final userinfo = FirebaseFirestore.instance
-          .collection("users")
-          .doc(uid)
-          .collection("profile")
-          .doc("info");
-    final notlikepostnums = context.watch<UserDataProvider>().userinfo?['NotLikePostNums'] ?? 0;
-    userinfo.update({'NotLikePostNums': notlikepostnums - 1}); // 重置不喜歡的文章數量
-    if (context.mounted) {
-        context.read<UserDataProvider>().refreshData();
-    }
+
   }
 
   void removeFavoriteDB(String uid, SavedPost content) async {
@@ -87,94 +78,9 @@ class _PostResultState extends State<PostResult> {
     for (var doc in query.docs) {
       await doc.reference.delete();
     }
-    
   }
 
-  void showWeightChooseDialog(BuildContext context) {
-    Map<String, double> newweight;
-    final uid = Provider.of<UserDataProvider>(context, listen: false).uid;
-    final userinfo = FirebaseFirestore.instance
-          .collection("users")
-          .doc(uid)
-          .collection("profile")
-          .doc("info");
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('請選擇一個選項'),
-        content: const Text('你認為生成的文章需要加強哪個面向？'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop('關鍵字契合度');
-              // 可在這裡執行紅色選項的邏輯
-            },
-            child: const Text('關鍵字契合度'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop('流量');
-              // 可在這裡執行藍色選項的邏輯
-            },
-            child: const Text('流量'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop('時效性');
-              // 可在這裡執行綠色選項的邏輯
-            },
-            child: const Text('時效性'),
-          ),
-        ],
-      ),
-    ).then((selected) async {
-      if (selected != null) {
-        if (selected == '關鍵字契合度') {
-          newweight = await changeWeight(weight: 'relevance');
-        } else if (selected == '流量') {
-          newweight = await changeWeight(weight: 'traffic');
-        } else if (selected == '時效性') {
-          newweight = await changeWeight(weight: 'recency');
-        }
-        else {
-          newweight = {
-            'relevance': 0.5,
-            'traffic': 0.3,
-            'recency': 0.2,
-          };
-        }
-        userinfo.update({
-          'weight': newweight
-        });
-      }
-    });
-  }
-
-  void updateWeight() async {
-    final uid = Provider.of<UserDataProvider>(context, listen: false).uid;
-    if (uid == null) return;
-
-    final userDoc = FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .collection('profile')
-        .doc('info');
-    final docSnapshot = await userDoc.get();
-    final notlikepostnums = docSnapshot.data()?['NotLikePostNums'] ?? 0;
-    int likecount = 0;
-    for (var like in _isFavorited) {
-      if (like == true) {
-        likecount++;
-      }
-    }
-    int newnotlikepostnums = notlikepostnums + currentResult.length - likecount;
-    if (newnotlikepostnums > 5) {
-      showWeightChooseDialog(context);
-      newnotlikepostnums = newnotlikepostnums - 5; // 超過5篇不喜歡的文章，觸發權重調整
-    }
-
-    await userDoc.update({'NotLikePostNums': newnotlikepostnums});
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -187,6 +93,7 @@ class _PostResultState extends State<PostResult> {
           .collection("profile")
           .doc("info");
     final notlikepostnums = context.watch<UserDataProvider>().userinfo?['NotLikePostNums'] ?? 0;
+    print(currentResult.length);
     userinfo.update({'NotLikePostNums': notlikepostnums + currentResult.length}); // 重置不喜歡的文章數量
     if (context.mounted) {
         context.read<UserDataProvider>().refreshData();
@@ -204,7 +111,6 @@ class _PostResultState extends State<PostResult> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
-            updateWeight();
             currentResult.clear();
           },
         ),

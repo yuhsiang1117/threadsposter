@@ -140,7 +140,7 @@ Future<bool> changeTone({required String tone, http.Client? client}) async {
   }
   return json['success'];
 }
-Future<Map<String, double>> changeWeight({required String weight, http.Client? client}) async {
+Future<bool> changeWeight({required String weight, http.Client? client}) async {
   final httpClient = client ?? http.Client();
   final url = Uri.parse('${getApiBaseUrl()}/change_weight'); // FastAPI API
   final response = await httpClient.post(
@@ -155,7 +155,24 @@ Future<Map<String, double>> changeWeight({required String weight, http.Client? c
   if (client == null) {
     httpClient.close();
   }
-  return json['new_weight'];
+  return json['success'];
+}
+Future<bool> setWeight({required Map<String, dynamic> weight, http.Client? client}) async {
+  final httpClient = client ?? http.Client();
+  final url = Uri.parse('${getApiBaseUrl()}/set_weight'); // FastAPI API
+  final response = await httpClient.post(
+    url,
+    body: jsonEncode(weight),
+    headers: {'Content-Type': 'application/json'},
+  );
+  final json = jsonDecode(response.body);
+  if (response.statusCode != 200) {
+    throw Exception('HTTP 錯誤：${response.statusCode}');
+  }
+  if (client == null) {
+    httpClient.close();
+  }
+  return json['success'];
 }
 
 
@@ -163,6 +180,7 @@ Future<Map<String, double>> changeWeight({required String weight, http.Client? c
 Future<List<String>> getTone({http.Client? client}) async {
   final httpClient = client ?? http.Client();
   final url = Uri.parse('${getApiBaseUrl()}/styles'); // FastAPI API
+
   final response = await httpClient.get(
     url,
     headers: {'Content-Type': 'application/json'},
@@ -176,6 +194,27 @@ Future<List<String>> getTone({http.Client? client}) async {
   }
   if (json['success'] == true && json['styles'] is List) {
     return List<String>.from(json['styles']);
+  } else {
+    throw Exception('API 錯誤：${json["error"] ?? "未知錯誤"}');
+  }
+}
+
+Future<Map<String, dynamic>> getWeight({http.Client? client}) async {
+  final httpClient = client ?? http.Client();
+  final url = Uri.parse('${getApiBaseUrl()}/get_weight'); // FastAPI API
+  final response = await httpClient.get(
+    url,
+    headers: {'Content-Type': 'application/json'},
+  );
+  final json = jsonDecode(response.body);
+  if (response.statusCode != 200) {
+    throw Exception('HTTP 錯誤：${response.statusCode}');
+  }
+  if (client == null) {
+    httpClient.close(); // 只關閉自己建立的 client
+  }
+  if (json['success'] == true && json['weight'] is Map<String, dynamic>) {
+    return Map<String, dynamic>.from(json['weight']);
   } else {
     throw Exception('API 錯誤：${json["error"] ?? "未知錯誤"}');
   }
@@ -262,6 +301,7 @@ Future<bool> postWithSchedule({
 Future<List<Map<String, dynamic>>> getAvailableTones({http.Client? client}) async {
   final httpClient = client ?? http.Client();
   final url = Uri.parse('${getApiBaseUrl()}/valid_tone'); // FastAPI API
+  debugPrint('Full tone url: $url');
   final response = await httpClient.get(
     url,
     headers: {'Content-Type': 'application/json'},

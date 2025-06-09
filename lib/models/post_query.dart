@@ -10,7 +10,7 @@ class PostQuery {
   int returnCount;
   String tone;
   String specificUser = '';
-  Map <String, double> weight;
+  Map<String, dynamic> weight;
 
   PostQuery({
     required this.userQuery,

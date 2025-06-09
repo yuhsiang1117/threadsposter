@@ -17,11 +17,6 @@ class Setting extends StatefulWidget {
     
     String? _name;
     String? _email;
-
-    void _navigateToEditProfile() async {
-      await Navigator.push(context,MaterialPageRoute(builder: (context) => const EditProfilePage()));
-      setState(() {});
-    }
   
 
     @override

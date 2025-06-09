@@ -23,6 +23,21 @@ class UserDataProvider extends ChangeNotifier {
       .get();
 
     userinfo = doc.data();
+    if(userinfo?['weight'] == null) {
+      userinfo?['weight'] = {
+        'relevance': 0.5,
+        'traffic': 0.3,
+        'recency': 0.2
+      };
+      await FirebaseFirestore.instance
+        .collection("users")
+        .doc(uid)
+        .collection("profile")
+        .doc('info')
+        .update({
+          'weight': userinfo?['weight']
+      });
+    }
     notifyListeners();
   }
 
@@ -40,6 +55,7 @@ class UserDataProvider extends ChangeNotifier {
       .get();
 
     userinfo = doc.data();
+    notifyListeners();
   }
 
   void addQuery(PostQuery query) {

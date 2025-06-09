@@ -1,6 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:provider/provider.dart';
 import 'package:threadsposter/main.dart';
+import 'package:threadsposter/services/UserData_provider.dart';
+import 'package:threadsposter/services/api.dart';
 import 'package:threadsposter/widgets/widgets.dart';
 
 Future<void> _showLocalNotification() async {
@@ -36,6 +40,18 @@ class NotificationPage extends StatefulWidget {
 class _NotificationPageState extends State<NotificationPage> {
   bool _isOn = false;
   void showWeightChooseDialog(BuildContext context) {
+    const defaultweight = {
+      'relevance': 0.1,
+      'traffic': 0.4,
+      'recency': 0.5,
+    };
+    Map<String, double> newweight;
+    final uid = Provider.of<UserDataProvider>(context, listen: false).uid;
+    final userinfo = FirebaseFirestore.instance
+          .collection("users")
+          .doc(uid)
+          .collection("profile")
+          .doc("info");
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -65,9 +81,25 @@ class _NotificationPageState extends State<NotificationPage> {
           ),
         ],
       ),
-    ).then((selected) {
+    ).then((selected) async {
       if (selected != null) {
-        ;
+        if (selected == '關鍵字契合度') {
+          await setWeight(weight: defaultweight);
+        } else if (selected == '流量') {
+          await changeWeight(weight: 'traffic');
+        } else if (selected == '時效性') {
+          await changeWeight(weight: 'recency');
+        }
+        else {
+          newweight = {
+            'relevance': 0.5,
+            'traffic': 0.3,
+            'recency': 0.2,
+          };
+        }
+        // userinfo.update({
+        //   'weight': newweight
+        // });
       }
     });
   }
@@ -109,6 +141,7 @@ class _NotificationPageState extends State<NotificationPage> {
                   onChanged: (bool newValue) {
                     setState(() {
                       _isOn = newValue;
+                      showWeightChooseDialog(context);
                       _showLocalNotification();
                     });
                   },

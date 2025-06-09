@@ -34,26 +34,16 @@ class _PostState extends State<Post> {
   int _selectedLikes = 1000;
   int _selectedCount = 3;
   String _errorMessage = '';
-  static Map <String, double> defaultWeight = {
-    'relevance': 0.5714,
-    'traffic': 0.3333,
-    'recency': 0.09523,
-  };  
+  Map<String, double> defaultWeight = {
+    'relevance': 0.5,
+    'traffic': 0.3,
+    'recency': 0.2,
+  };
+  
   late ThemeData theme;
   late ColorScheme colorScheme;
-
-  PostQuery postQuery = PostQuery(
-    userQuery: '',
-    tag: '',
-    style: 'Emotion',
-    withInDays: 15,
-    size: parseSize("Short"),
-    gclikes: 1000,
-    returnCount: 3,
-    tone: 'none',
-    specificUser: '',
-    weight: defaultWeight
-  );
+  late Map<String, dynamic> weight;
+  late PostQuery postQuery;
 
   @override
   void initState() {
@@ -70,6 +60,21 @@ class _PostState extends State<Post> {
     final currentPage = toneProvider.currentPage;
     theme = Theme.of(context);
     colorScheme = theme.colorScheme;
+
+    weight = context.watch<UserDataProvider>().userinfo?['weight'] ?? defaultWeight;
+
+    postQuery = PostQuery(
+      userQuery: '',
+      tag: '',
+      style: 'Emotion',
+      withInDays: 15,
+      size: parseSize("Short"),
+      gclikes: 1000,
+      returnCount: 3,
+      tone: 'none',
+      specificUser: '',
+      weight: weight
+    );
 
     if (queryFromHistory != null) {
       _selectedTone = tones[currentPage].id;
@@ -301,6 +306,7 @@ class _PostState extends State<Post> {
             //   ),
             // ];
             //navigationService.goPostResult(testPosts);
+            setWeight(weight: weight);
             _sendPostQuery(postQuery).then((result) {
               setState(() {
                 _isGenerating = false;

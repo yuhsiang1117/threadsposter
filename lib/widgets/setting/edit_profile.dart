@@ -42,7 +42,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
   if (context.mounted) {
       context.read<UserDataProvider>().refreshData();
   }
-  await Future.delayed(Duration(seconds: 1));
   Navigator.pop(context);
 }
 

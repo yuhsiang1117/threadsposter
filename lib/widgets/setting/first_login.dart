@@ -44,8 +44,6 @@ class _FirstLoginPageState extends State<FirstLoginPage> {
     );
 
     try {
-      final fcmToken = await FirebaseMessaging.instance.getToken();
-      print("FCM Token: $fcmToken");
 
       await FirebaseFirestore.instance
           .collection("users")
@@ -56,13 +54,12 @@ class _FirstLoginPageState extends State<FirstLoginPage> {
         'name': name,
         'email': email,
         'nextPostID': 0,
-        'token': fcmToken,
         'weight': {
           'relevance': 0.5,
           'traffic': 0.3,
           'recency': 0.2,
         },
-        'NotLikePostNums': 0,
+        'NotLikePostNums': 5,
       }, SetOptions(merge: true));
 
       if (context.mounted) {

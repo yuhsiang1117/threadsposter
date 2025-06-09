@@ -155,12 +155,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
-                      icon: Image.asset(
-                        'assets/google_logo.png',
-                        height: 24,
-                        width: 24,
-                        errorBuilder: (_, __, ___) => Icon(Icons.login, color: Colors.red),
-                      ),
                       label: const Text('已有帳號？直接登入'),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
