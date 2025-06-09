@@ -26,9 +26,13 @@ class CharacterCard extends StatelessWidget {
       : () {
         final navigationService = Provider.of<NavigationService>(context, listen: false);
         if(index == toneOptions.length - 1) {
-          toneOptions[index].name = '@$customTone';
+          toneProvider.customToneDisplay = '@$customTone';
+          debugPrint('[CharacterCard] Custom tone selected: ${toneProvider.customToneDisplay}');
+          navigationService.goPost(toneID: 'custom', specific_user: toneProvider.customToneDisplay);
         }
-        navigationService.goPost(tone: toneOptions[index].name);
+        else {
+          navigationService.goPost(toneID: toneOptions[index].id);
+        }
       },
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),

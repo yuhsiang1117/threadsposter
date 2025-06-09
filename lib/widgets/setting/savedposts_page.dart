@@ -169,16 +169,15 @@ class _SavedPostPageState extends State<SavedPostPage> {
                                               style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
                                             ),
                                           ),
-                                          if (article.style != null)
-                                            Padding(
-                                              padding: const EdgeInsets.only(left: 8),
-                                              child: Chip(
-                                                label: Text(article.style!, style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onPrimary)),
-                                                backgroundColor: _chipColor(article.style),
-                                                labelStyle: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onPrimary),
-                                                padding: const EdgeInsets.symmetric(horizontal: 8),
-                                              ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(left: 8),
+                                            child: Chip(
+                                              label: Text(article.style!, style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onPrimary)),
+                                              backgroundColor: _chipColor(article.style),
+                                              labelStyle: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onPrimary),
+                                              padding: const EdgeInsets.symmetric(horizontal: 8),
                                             ),
+                                          ),
                                         ],
                                       ),
                                     ),

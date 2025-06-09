@@ -32,7 +32,7 @@ class _HistoryPageState extends State<HistoryPage> {
         final data = doc.data();
         queryHistorys.add(QueryHistory(
           title: data['title'] ?? 'No Title',
-          tone: data['tone'] ?? 'No Tone',
+          toneID: data['tone'] ?? 'No Tone',
           tag: data['tag'] ?? 'No Tag',
           style: data['style'] ?? 'No Style',
           size: data['size'] ?? 'No Size',
@@ -55,6 +55,7 @@ class _HistoryPageState extends State<HistoryPage> {
   Widget build(BuildContext context) {
     final queries = context.watch<UserDataProvider>().queries;
     ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final toneProvider = Provider.of<ToneProvider>(context, listen: false);
 
     return Scaffold(
       backgroundColor: colorScheme.surfaceContainer,
@@ -71,7 +72,16 @@ class _HistoryPageState extends State<HistoryPage> {
         foregroundColor: colorScheme.onPrimary,
         elevation: 2,
       ),
-      body: ListView.builder(
+      body: queryHistorys.isEmpty
+      ? Center(
+        child: Text(
+          '沒有歷史紀錄',
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
+        ),
+      )
+      : ListView.builder(
         padding: const EdgeInsets.all(12),
         itemCount: queryHistorys.length,
         itemBuilder: (context, index) {
@@ -84,9 +94,9 @@ class _HistoryPageState extends State<HistoryPage> {
               borderRadius: BorderRadius.circular(12),
               onTap: () {
                 final navigationService = Provider.of<NavigationService>(context, listen: false);
-                final toneProvider = Provider.of<ToneProvider>(context, listen: false);
-                toneProvider.currentPage = toneProvider.nameToIndex(query.tone);
-                navigationService.goPost(tone: toneProvider.nameToId(query.tone), fromHistory: true, query: query);
+                toneProvider.currentPage = toneProvider.idToIndex(query.toneID);
+                debugPrint('[HistoryPage] Navigating to post with query: ${query.toString()}');
+                navigationService.goPost(toneID: query.toneID, fromHistory: true, query: query);
                 Navigator.pop(context);
               },
               child: Card(
@@ -104,17 +114,17 @@ class _HistoryPageState extends State<HistoryPage> {
                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                       Text(query.title),
                       const SizedBox(height: 8),
-                      Text('角色： ${query.tone}'),
+                      Text('角色： ${toneProvider.idToName(query.toneID)}'),
                       Text('內容概述： ${query.tag}', style: TextStyle(color: Colors.grey[700])),
                       Text('文章風格： ${query.style}', style: TextStyle(color: Colors.grey[700])),
                       Text('文章長度： ${query.size}', style: TextStyle(color: Colors.grey[700])),
-                      if (query.specific_user.isNotEmpty)
+                      if (query.specific_user != '')
                         Text(
                           '特定使用者： ${query.specific_user}',
                           style: TextStyle(color: Colors.grey[700])
                         ),
                       Text(
-                          '生成時間： ${DateFormat('yyyy/MM/dd HH:mm').format(query.queryTime.toDate().add(const Duration(hours: 8)))}', // UTC+0轉UTC+8
+                          '生成時間： ${DateFormat('yyyy/MM/dd HH:mm').format(query.queryTime.toDate())}', // UTC+0轉UTC+8
                           style: TextStyle(color: Colors.grey[700]),
                       ),
                     ],

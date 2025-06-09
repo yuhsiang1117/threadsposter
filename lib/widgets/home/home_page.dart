@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:threadsposter/widgets/widgets.dart';
 import 'package:threadsposter/services/navigation.dart';
 import 'package:threadsposter/services/UserData_provider.dart';
-import 'package:threadsposter/widgets/setting/first_login.dart';
 import 'package:threadsposter/models/data_lists.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

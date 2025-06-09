@@ -69,7 +69,7 @@ class _NotificationPageState extends State<NotificationPage> {
                   value: _isOn,
                   activeColor: colorScheme.primary,
                   inactiveThumbColor: colorScheme.outlineVariant,
-                  inactiveTrackColor: colorScheme.surfaceVariant,
+                  inactiveTrackColor: colorScheme.surfaceContainerHighest,
                   onChanged: (bool newValue) {
                     setState(() {
                       _isOn = newValue;

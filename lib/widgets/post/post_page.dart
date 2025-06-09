@@ -10,6 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:threadsposter/services/UserData_provider.dart';
 
 String currentTone = '';
+String currentToneDisplay = '尚未自訂角色';
 QueryHistory? queryFromHistory;
 
 class Post extends StatefulWidget {
@@ -22,16 +23,19 @@ class Post extends StatefulWidget {
 class _PostState extends State<Post> {
   final TextEditingController _tagsController = TextEditingController();
   final TextEditingController _queryController = TextEditingController();
+  late ToneProvider toneProvider;
   bool _isGenerating = false;
 
   String _selectedStyle = 'Emotion';
-  String _selectedTone = 'None';
-  // String _selectedTag = '';
-  int _selectedSize = parseSize("Short");
+  String _selectedTone = '管家';
+  String _selectedToneDisplay = '管家';
+  String _selectedSize = 'Short'; // 預設為 Short
   int _selectedDays = 15;
   int _selectedLikes = 1000;
   int _selectedCount = 3;
   String _errorMessage = '';
+  late ThemeData theme;
+  late ColorScheme colorScheme;
 
   PostQuery postQuery = PostQuery(
     userQuery: '',
@@ -48,11 +52,39 @@ class _PostState extends State<Post> {
   @override
   void initState() {
     super.initState();
+  }
+  bool _isFirstInit = true;
+  // 依賴context的初始化
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    toneProvider = Provider.of<ToneProvider>(context);
+    final tones = toneProvider.tones.isNotEmpty ? toneProvider.tones : defaultToneOptions;
+    final currentPage = toneProvider.currentPage;
+    theme = Theme.of(context);
+    colorScheme = theme.colorScheme;
+
     if (queryFromHistory != null) {
-      _tagsController.text = queryFromHistory!.tag;
+      _selectedTone = tones[currentPage].id;
+      _selectedToneDisplay = queryFromHistory!.toneID == 'custom' 
+        ? '@${queryFromHistory!.specific_user}' 
+        : toneProvider.idToName(queryFromHistory!.toneID);
       _queryController.text = queryFromHistory!.title;
+      _tagsController.text = queryFromHistory!.tag;
       _selectedStyle = queryFromHistory!.style;
-      _selectedSize = parseSize(queryFromHistory!.size);
+      _selectedSize = queryFromHistory!.size;
+      queryFromHistory = null; // 清除歷史查詢，避免重複使用
+      _isFirstInit = false; // 只在第一次初始化時設置
+    }
+    else if (_isFirstInit) {
+      _selectedTone = tones[currentPage].id;
+      _selectedToneDisplay = _selectedTone == 'custom' ? toneProvider.customToneDisplay : tones[currentPage].name;
+      _queryController.text = '';
+      _tagsController.text = '';
+      _selectedStyle = 'Emotion';
+      _selectedSize = 'Short';
+      _isFirstInit = false; // 只在第一次初始化時設置
     }
   }
 
@@ -65,13 +97,7 @@ class _PostState extends State<Post> {
 
   @override
   Widget build(BuildContext context) {
-    final toneProvider = Provider.of<ToneProvider>(context);
-    final tones = toneProvider.tones.isNotEmpty ? toneProvider.tones : defaultToneOptions;
-    final currentPage = toneProvider.currentPage;
-    final currentTone = tones.isNotEmpty && currentPage < tones.length ? tones[currentPage].name : 'none';
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    _selectedTone = queryFromHistory != null ? toneProvider.idToName(queryFromHistory!.tone) : currentTone;
+    debugPrint('[Post] current style: $_selectedStyle');
     return Scaffold(
       backgroundColor: colorScheme.surfaceContainer,
       appBar: AppBar(
@@ -110,7 +136,7 @@ class _PostState extends State<Post> {
                     ),
                   ),
                   Text(
-                    _selectedTone,
+                    _selectedToneDisplay,
                     style: theme.textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: colorScheme.primary,
@@ -122,6 +148,7 @@ class _PostState extends State<Post> {
               _buildTagsInputField(),
               const SizedBox(height: 10),
               StyleSelection(
+                selectedStyle: _selectedStyle,
                 onStyleSelected: (style) {
                   setState(() {
                     _selectedStyle = style;
@@ -130,9 +157,10 @@ class _PostState extends State<Post> {
               ),
               const SizedBox(height: 10),
               SizeSelection(
+                selectedSize: _selectedSize,
                 onSizeSelected: (size) {
                   setState(() {
-                    _selectedSize = parseSize(size);
+                    _selectedSize = size;
                   });
                 },
               ),
@@ -231,15 +259,19 @@ class _PostState extends State<Post> {
               _isGenerating = true;
             });
             _buildPostQuery();
+            debugPrint('[Post] _selectedStyle: $_selectedStyle');
+            debugPrint('[Post] specific_user: ${postQuery.specificUser}');
+            debugPrint('[Post] toneID: ${postQuery.tone}');
+            final toneProvider = Provider.of<ToneProvider>(context, listen: false);
             addHistoryDB(
               Provider.of<UserDataProvider>(context, listen: false).uid!,
               QueryHistory(
                 title: postQuery.userQuery,
-                tone: Provider.of<ToneProvider>(context, listen: false).idToName(postQuery.tone),
+                toneID: postQuery.tone,
                 tag: postQuery.tag,
                 style: postQuery.style,
                 size: postQuery.size == 10 ? 'Short' : postQuery.size == 30 ? 'Medium' : 'Long',
-                specific_user: postQuery.tone == 'custom'? '' : postQuery.specificUser,
+                specific_user: postQuery.specificUser,
               ),
             );
             debugPrint('PostQuery: \\${postQuery.toString()}');
@@ -310,19 +342,16 @@ class _PostState extends State<Post> {
     postQuery.tag = _tagsController.text;
     postQuery.style = _selectedStyle;
     postQuery.withInDays = _selectedDays;
-    postQuery.size = _selectedSize;
+    postQuery.size = parseSize(_selectedSize);
     postQuery.gclikes = _selectedLikes;
     postQuery.returnCount = _selectedCount;
     // 根據 _selectedTone (name) 找到對應的 ToneOption 並設置 tone
     final toneProvider = Provider.of<ToneProvider>(context, listen: false);
-    final toneOptions = toneProvider.tones.isNotEmpty ? toneProvider.tones : defaultToneOptions;
-    final toneOption = toneOptions.firstWhere(
-      (tone) => tone.name == _selectedTone,
-      orElse: () => ToneOption('', _selectedTone, ''),
-    ).id;
+    // final toneOptions = toneProvider.tones.isNotEmpty ? toneProvider.tones : defaultToneOptions;
+    final toneOption = _selectedTone;
     postQuery.tone = toneOption;
     if(toneOption == 'custom') {
-      postQuery.specificUser = _selectedTone.substring(1);
+      postQuery.specificUser = _selectedToneDisplay.substring(1); // 去掉 '@' 符號
     } else {
       postQuery.specificUser = '';
     }
@@ -336,11 +365,12 @@ class _PostState extends State<Post> {
         .doc(); // 使用自動生成的文檔 Id
 
     await docRef.set({
-      'title': content.title,
-      'tone': content.tone,
-      'tag': content.tag,
+      'title': content.tag,
+      'tone': content.toneID,
+      'tag': content.title,
       'style': content.style,
       'size': content.size,
+      'specific_user': content.specific_user,
       'savedAt': FieldValue.serverTimestamp(), // 添加時間戳
     });
   }

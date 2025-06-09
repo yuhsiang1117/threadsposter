@@ -44,7 +44,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<String?> showPasswordInputDialog(BuildContext context, String email) {
-  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   return showDialog<String>(
     context: context,
@@ -58,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
             Text('你已擁有帳號（$email），將自動關聯，請輸入密碼:'),
             SizedBox(height: 12),
             TextField(
-              controller: _passwordController,
+              controller: passwordController,
               obscureText: true,
               decoration: InputDecoration(
                 labelText: '密碼',
@@ -74,7 +74,7 @@ class _LoginPageState extends State<LoginPage> {
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.of(context).pop(_passwordController.text);
+              Navigator.of(context).pop(passwordController.text);
             },
             child: Text('確認'),
           ),

@@ -4,9 +4,9 @@ import 'package:threadsposter/widgets/widgets.dart';
 import 'package:threadsposter/models/data_lists.dart';
 
 class StyleSelection extends StatefulWidget {
-
+  final String selectedStyle;
   final void Function(String)? onStyleSelected;
-  const StyleSelection({super.key, this.onStyleSelected});
+  const StyleSelection({super.key, this.onStyleSelected, required this.selectedStyle});
 
   @override
   State<StyleSelection> createState() => _StyleSelectionState();
@@ -18,10 +18,6 @@ class _StyleSelectionState extends State<StyleSelection> {
   double width = 0.0;
 
   void _onStyleChanged(String tone) {
-    setState(() {
-      selectedStyle = tone;
-    });
-
     if (widget.onStyleSelected != null) {
       widget.onStyleSelected!(tone); // 傳出去
     }
@@ -30,7 +26,7 @@ class _StyleSelectionState extends State<StyleSelection> {
   @override
   void initState() {
     super.initState();
-    selectedStyle = styleOptions.first;
+    selectedStyle = widget.selectedStyle;
     updateWidth(selectedStyle!);
   }
 
@@ -78,9 +74,9 @@ class _StyleSelectionState extends State<StyleSelection> {
                 onTap: () {
                   setState(() {
                     selectedStyle = style;
-                    _onStyleChanged(style);
-                    updateWidth(style);
                   });
+                  _onStyleChanged(style);
+                  updateWidth(style);
                 },
                 child: Card(
                   color: isSelected ? colorScheme.primary : colorScheme.surface,

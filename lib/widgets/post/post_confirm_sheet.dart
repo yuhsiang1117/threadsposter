@@ -161,7 +161,7 @@ Future<(bool?, DateTime?)?> showPostConfirmSheet({
                           '預定發文時間：'
                           '${pickedTime != null ? '${pickedTime!.year}/${pickedTime!.month}/${pickedTime!.day} ' : ''}'
                           '${pickedTime != null ? pickedTime!.hour.toString().padLeft(2, '0') : ''}'
-                          '${pickedTime != null ? ':' + pickedTime!.minute.toString().padLeft(2, '0') : ''}',
+                          '${pickedTime != null ? ':${pickedTime!.minute.toString().padLeft(2, '0')}' : ''}',
                           style: const TextStyle(fontSize: 16, color: Colors.blue, decoration: TextDecoration.underline),
                         ),
                       ),

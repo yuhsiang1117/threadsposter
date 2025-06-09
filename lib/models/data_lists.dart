@@ -22,6 +22,15 @@ class ToneProvider with ChangeNotifier {
     }
   }
 
+  String _customToneDisplay = '';
+  String get customToneDisplay => _customToneDisplay.isEmpty ? '尚未自訂角色' : _customToneDisplay;
+  set customToneDisplay(String value) {
+    if (_customToneDisplay != value) {
+      _customToneDisplay = value;
+      notifyListeners();
+    }
+  }
+
   Future<void> fetchTones() async {
     _toneOptions = await updateToneOptions();
     notifyListeners();
@@ -42,7 +51,7 @@ class ToneProvider with ChangeNotifier {
         return _toneOptions[i].name;
       }
     }
-    return 'none'; // 如果找不到，返回 'none'
+    return id; // 如果找不到，返回 id 本身(custom)
   }
 
   int nameToIndex(String name) {
@@ -51,7 +60,7 @@ class ToneProvider with ChangeNotifier {
         return i;
       }
     }
-    return 0; // 如果找不到，返回 0
+    return _toneOptions.length - 1; // 如果找不到，返回最後一個索引(custom)
   }
 
   int idToIndex(String id) {
@@ -68,7 +77,7 @@ List<ToneOption> defaultToneOptions = [
   ToneOption('none', '管家', '你是一位能完美完成所下達任務的管家'),
   ToneOption('boss', '霸道總裁', '是一位霸道總裁，說話風 格具有自信、愛用命令句，語氣十分的霸氣，且對自己的女人有強烈的保護慾'),
   ToneOption('simp', '暈船仔', '是一位重度暈船仔，講話時常會有小劇場，情感豐沛但壓抑不敢說破'),
-  ToneOption('custom', '', '自訂帳號風格'),
+  ToneOption('custom', '自訂角色', '自訂帳號風格'),
 ];
 
 Future<List<ToneOption>> updateToneOptions() async {
@@ -88,7 +97,7 @@ Future<List<ToneOption>> updateToneOptions() async {
   for (var tone in tonesResponse){
     toneOptions.add(ToneOption(tone['id'], tone['name'], tone['description']));
   }
-  toneOptions.add(ToneOption('custom', '', '自訂帳號風格'));
+  toneOptions.add(ToneOption('custom', '自訂角色', '自訂帳號風格'));
   return toneOptions;
 }
 const List<String> styleOptions = [

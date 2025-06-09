@@ -125,14 +125,14 @@ class Setting extends StatefulWidget {
                 navigationService.goHistory();
               },
             ),
-            _buildDivider(),
-            _buildMenuItem(
-              icon: Icons.notifications,
-              title: '通知設定',
-              onTap: () {
-                navigationService.goNotification();
-              },
-            ),
+            // _buildDivider(),
+            // _buildMenuItem(
+            //   icon: Icons.notifications,
+            //   title: '通知設定',
+            //   onTap: () {
+            //     navigationService.goNotification();
+            //   },
+            // ),
             _buildDivider(),
             _buildMenuItem(
               icon: Icons.schedule,
@@ -151,14 +151,14 @@ class Setting extends StatefulWidget {
                 navigationService.goApiTest();
               },
             ),
-            _buildDivider(),
-            _buildMenuItem(
-              icon: Icons.app_settings_alt,
-              title: 'API 設定',
-              onTap: () {
-                navigationService.goApisetting();
-              },
-            ),
+            // _buildDivider(),
+            // _buildMenuItem(
+            //   icon: Icons.app_settings_alt,
+            //   title: 'API 設定',
+            //   onTap: () {
+            //     navigationService.goApisetting();
+            //   },
+            // ),
             // _buildDivider(),
             // _buildMenuItem(
             //   icon: Icons.help,

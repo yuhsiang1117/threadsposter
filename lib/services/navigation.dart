@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:threadsposter/widgets/setting/edit_profile.dart';
-import 'package:provider/provider.dart';
-import 'package:threadsposter/models/data_lists.dart';
 import 'package:threadsposter/widgets/widgets.dart';
 import 'package:threadsposter/services/api.dart';
 import 'package:threadsposter/widgets/login.dart';
@@ -129,12 +127,15 @@ class NavigationService {
   }
 
   void goPost({
-    required String tone, 
+    required String toneID,
+    String specific_user = 'custom',
     bool fromHistory = false, 
     QueryHistory? query,
   }) {
-    routerConfig.go('/post');
-    currentTone = tone;
+    currentTone = toneID;
+    if (specific_user != 'custom') {
+      currentToneDisplay = specific_user;
+    }
     if (fromHistory && query != null) {
       queryFromHistory = QueryHistory(
         title: query.title,
@@ -142,9 +143,10 @@ class NavigationService {
         style: query.style,
         size: query.size,
         specific_user: query.specific_user,
-        tone: tone
+        toneID: toneID
       );
     }
+    routerConfig.go('/post');
   }
 
   void goSetting() {

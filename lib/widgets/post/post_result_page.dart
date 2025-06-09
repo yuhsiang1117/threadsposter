@@ -267,7 +267,7 @@ class _PostResultState extends State<PostResult> {
               ),
               const SizedBox(width: 8),
               ElevatedButton.icon(
-                icon: const Icon(Icons.send),
+                icon: Icon(Icons.send, color: colorScheme.onPrimary),
                 label: const Text('發文'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: colorScheme.primary,
