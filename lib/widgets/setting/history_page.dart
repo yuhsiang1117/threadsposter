@@ -14,11 +14,11 @@ class HistoryPage extends StatefulWidget {
   State<HistoryPage> createState() => _HistoryPageState();
 }
 
-class _HistoryPageState extends State<HistoryPage> {
+class _HistoryPageState extends State<HistoryPage> with SingleTickerProviderStateMixin {
   List<QueryHistory> queryHistorys = [];
+  late AnimationController _animationController;
 
   void loadHistory(String uid) async {
-
     final query = await FirebaseFirestore.instance
         .collection('users')
         .doc(uid)
@@ -41,6 +41,9 @@ class _HistoryPageState extends State<HistoryPage> {
         ));
         queryHistorys.sort((a, b) => b.queryTime.compareTo(a.queryTime));
       }
+      if (queryHistorys.isNotEmpty) {
+        _animationController.forward(from: 0);
+      }
     });
   }
 
@@ -49,6 +52,17 @@ class _HistoryPageState extends State<HistoryPage> {
     super.initState();
     final uid = Provider.of<UserDataProvider>(context, listen: false).uid;
     loadHistory(uid!);
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+    // 不在這裡 forward
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -86,48 +100,63 @@ class _HistoryPageState extends State<HistoryPage> {
         itemCount: queryHistorys.length,
         itemBuilder: (context, index) {
           final query = queryHistorys[index];
-
-          return Material(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
-            child: InkWell(
+          final double singleDuration = 0.35;
+          final double overlap = 0.10;
+          final double start = index * overlap;
+          final double end = (start + singleDuration).clamp(0.0, 1.0);
+          final animation = Tween<Offset>(
+            begin: const Offset(0, 4),
+            end: Offset.zero,
+          ).animate(
+            CurvedAnimation(
+              parent: _animationController,
+              curve: Interval(start, end, curve: Curves.easeOutCubic),
+            ),
+          );
+          return SlideTransition(
+            position: animation,
+            child: Material(
+              color: Colors.transparent,
               borderRadius: BorderRadius.circular(12),
-              onTap: () {
-                final navigationService = Provider.of<NavigationService>(context, listen: false);
-                toneProvider.currentPage = toneProvider.idToIndex(query.toneID);
-                debugPrint('[HistoryPage] Navigating to post with query: ${query.toString()}');
-                navigationService.goPost(toneID: query.toneID, fromHistory: true, query: query);
-                Navigator.pop(context);
-              },
-              child: Card(
-                elevation: 3,
-                margin: const EdgeInsets.symmetric(vertical: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('文章主題：',
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                      Text(query.title),
-                      const SizedBox(height: 8),
-                      Text('角色： ${toneProvider.idToName(query.toneID)}'),
-                      Text('內容概述： ${query.tag}', style: TextStyle(color: Colors.grey[700])),
-                      Text('文章風格： ${query.style}', style: TextStyle(color: Colors.grey[700])),
-                      Text('文章長度： ${query.size}', style: TextStyle(color: Colors.grey[700])),
-                      if (query.specific_user != '')
+              child: InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: () {
+                  final navigationService = Provider.of<NavigationService>(context, listen: false);
+                  toneProvider.currentPage = toneProvider.idToIndex(query.toneID);
+                  debugPrint('[HistoryPage] Navigating to post with query: ${query.toString()}');
+                  navigationService.goPost(toneID: query.toneID, fromHistory: true, query: query);
+                  Navigator.pop(context);
+                },
+                child: Card(
+                  elevation: 3,
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('文章主題：',
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                        Text(query.title),
+                        const SizedBox(height: 8),
+                        Text('角色： ${toneProvider.idToName(query.toneID)}'),
+                        Text('內容概述： ${query.tag}', style: TextStyle(color: Colors.grey[700])),
+                        Text('文章風格： ${query.style}', style: TextStyle(color: Colors.grey[700])),
+                        Text('文章長度： ${query.size}', style: TextStyle(color: Colors.grey[700])),
+                        if (query.specific_user != '')
+                          Text(
+                            '特定使用者： ${query.specific_user}',
+                            style: TextStyle(color: Colors.grey[700])
+                          ),
                         Text(
-                          '特定使用者： ${query.specific_user}',
-                          style: TextStyle(color: Colors.grey[700])
+                            '生成時間： ${DateFormat('yyyy/MM/dd HH:mm').format(query.queryTime.toDate())}', // UTC+0轉UTC+8
+                            style: TextStyle(color: Colors.grey[700]),
                         ),
-                      Text(
-                          '生成時間： ${DateFormat('yyyy/MM/dd HH:mm').format(query.queryTime.toDate())}', // UTC+0轉UTC+8
-                          style: TextStyle(color: Colors.grey[700]),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),

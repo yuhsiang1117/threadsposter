@@ -12,29 +12,9 @@ class SavedPostPage extends StatefulWidget {
   State<SavedPostPage> createState() => _SavedPostPageState();
 }
 
-class _SavedPostPageState extends State<SavedPostPage> {
+class _SavedPostPageState extends State<SavedPostPage> with SingleTickerProviderStateMixin {
   List<SavedPost> savedArticles = [];
-  void loadFavorites(String uid) async {
-
-    final query = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .collection('favorites')
-        .get();
-
-    setState(() {
-      debugPrint('[SavedPostPage] Loaded ${query.docs.length} saved articles for user $uid');
-      savedArticles.clear();
-      for (var doc in query.docs) {
-        final data = doc.data();
-        savedArticles.add(SavedPost(
-          title: data['title'],
-          content: data['content'],
-          style: data['style'],
-        ));
-      }
-    });
-  }
+  late AnimationController _animationController;
 
   void removeFavoriteDB(String uid, SavedPost content) async {
 
@@ -67,6 +47,41 @@ class _SavedPostPageState extends State<SavedPostPage> {
     super.initState();
     final uid = Provider.of<UserDataProvider>(context, listen: false).uid;
     loadFavorites(uid!);
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+    // 不在這裡 forward
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void loadFavorites(String uid) async {
+    final query = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('favorites')
+        .get();
+
+    setState(() {
+      debugPrint('[SavedPostPage] Loaded ${query.docs.length} saved articles for user $uid');
+      savedArticles.clear();
+      for (var doc in query.docs) {
+        final data = doc.data();
+        savedArticles.add(SavedPost(
+          title: data['title'],
+          content: data['content'],
+          style: data['style'],
+        ));
+      }
+      if (savedArticles.isNotEmpty) {
+        _animationController.forward(from: 0);
+      }
+    });
   }
 
   @override
@@ -139,92 +154,108 @@ class _SavedPostPageState extends State<SavedPostPage> {
                     itemBuilder: (context, index) {
                       final article = filteredArticles[index];
                       final realIndex = savedArticles.indexOf(article);
-                      return Card(
-                        elevation: 4,
-                        color: Theme.of(context).colorScheme.surface,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                        child: InkWell(
-                          onLongPress: () {
-                            final content = article.content ?? '';
-                            Clipboard.setData(ClipboardData(text: content));
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('已複製到剪貼簿')),
-                            );
-                          },
-                          borderRadius: BorderRadius.circular(20),
-                          child: Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              article.title ?? '',
-                                              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
+                      final double singleDuration = 0.35;
+                      final double overlap = 0.10;
+                      final double start = index * overlap;
+                      final double end = (start + singleDuration).clamp(0.0, 1.0);
+                      final animation = Tween<Offset>(
+                        begin: const Offset(0, 4),
+                        end: Offset.zero,
+                      ).animate(
+                        CurvedAnimation(
+                          parent: _animationController,
+                          curve: Interval(start, end, curve: Curves.easeOutCubic),
+                        ),
+                      );
+                      return SlideTransition(
+                        position: animation,
+                        child: Card(
+                          elevation: 4,
+                          color: Theme.of(context).colorScheme.surface,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          child: InkWell(
+                            onLongPress: () {
+                              final content = article.content ?? '';
+                              Clipboard.setData(ClipboardData(text: content));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('已複製到剪貼簿')),
+                              );
+                            },
+                            borderRadius: BorderRadius.circular(20),
+                            child: Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                article.title ?? '',
+                                                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
+                                              ),
                                             ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(left: 8),
-                                            child: Chip(
-                                              label: Text(article.style!, style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onPrimary)),
-                                              backgroundColor: _chipColor(article.style),
-                                              labelStyle: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onPrimary),
-                                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                                            Padding(
+                                              padding: const EdgeInsets.only(left: 8),
+                                              child: Chip(
+                                                label: Text(article.style!, style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onPrimary)),
+                                                backgroundColor: _chipColor(article.style),
+                                                labelStyle: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onPrimary),
+                                                padding: const EdgeInsets.symmetric(horizontal: 8),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      PopupMenuButton<String>(
+                                        color: Theme.of(context).colorScheme.surface,
+                                        onSelected: (value) {
+                                          if (value == 'delete') {
+                                            setState(() {
+                                              removeFavoriteDB(
+                                                Provider.of<UserDataProvider>(context, listen: false).uid!,
+                                                savedArticles[realIndex],
+                                              );
+                                              savedArticles.removeAt(realIndex);
+                                            });
+                                          }
+                                        },
+                                        itemBuilder: (context) => [
+                                          PopupMenuItem(
+                                            value: 'delete',
+                                            child: Row(
+                                              children: [
+                                                Icon(Icons.delete, color: Colors.red, size: 20),
+                                                const SizedBox(width: 8),
+                                                Text('刪除', style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.red)),
+                                              ],
                                             ),
                                           ),
                                         ],
                                       ),
-                                    ),
-                                    PopupMenuButton<String>(
+                                    ],
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Container(
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
                                       color: Theme.of(context).colorScheme.surface,
-                                      onSelected: (value) {
-                                        if (value == 'delete') {
-                                          setState(() {
-                                            removeFavoriteDB(
-                                              Provider.of<UserDataProvider>(context, listen: false).uid!,
-                                              savedArticles[realIndex],
-                                            );
-                                            savedArticles.removeAt(realIndex);
-                                          });
-                                        }
-                                      },
-                                      itemBuilder: (context) => [
-                                        PopupMenuItem(
-                                          value: 'delete',
-                                          child: Row(
-                                            children: [
-                                              Icon(Icons.delete, color: Colors.red, size: 20),
-                                              const SizedBox(width: 8),
-                                              Text('刪除', style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.red)),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
+                                      borderRadius: BorderRadius.circular(12),
                                     ),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                                Container(
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context).colorScheme.surface,
-                                    borderRadius: BorderRadius.circular(12),
+                                    padding: const EdgeInsets.all(14),
+                                    child: Text(
+                                      article.content ?? '',
+                                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurface),
+                                      softWrap: true,
+                                      overflow: TextOverflow.visible,
+                                    ),
                                   ),
-                                  padding: const EdgeInsets.all(14),
-                                  child: Text(
-                                    article.content ?? '',
-                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurface),
-                                    softWrap: true,
-                                    overflow: TextOverflow.visible,
-                                  ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),

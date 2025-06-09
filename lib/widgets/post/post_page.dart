@@ -351,7 +351,7 @@ class _PostState extends State<Post> {
     postQuery.size = parseSize(_selectedSize);
     postQuery.gclikes = _selectedLikes;
     postQuery.returnCount = _selectedCount;
-    postQuery.weight = context.watch<UserDataProvider>().userinfo?['weight'] ?? defaultWeight;
+    postQuery.weight = Provider.of<UserDataProvider>(context, listen: false).userinfo?['weight'] ?? defaultWeight;
     // 根據 _selectedTone (name) 找到對應的 ToneOption 並設置 tone
     final toneProvider = Provider.of<ToneProvider>(context, listen: false);
     // final toneOptions = toneProvider.tones.isNotEmpty ? toneProvider.tones : defaultToneOptions;
